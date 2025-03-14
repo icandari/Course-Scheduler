@@ -28,37 +28,44 @@ pool.connect((err, client, release) => {
  */
 router.get('/courses/search', async (req, res) => {
     try {
-        const { query, limit = 5 } = req.query;
-        
-        if (!query) {
-            return res.status(400).json({ error: 'Query parameter is required.' });
-        }
-
-        const searchQuery = `
-            SELECT 
-                c.id,
-                c.course_name,
-                c.course_type
-            FROM courses c
-            WHERE 
-                c.course_name ILIKE $1 OR
-                c.course_type ILIKE $1
-            ORDER BY c.course_name
-            LIMIT $2
-        `;
-        
-        const searchValue = [`%${query}%`, parseInt(limit, 10) || 5];
-        const { rows } = await pool.query(searchQuery, searchValue);
-
-        res.json({ 
-            count: rows.length,
-            courses: rows 
-        });
+      const { query, limit = 5, course_type } = req.query;
+      
+      if (!query) {
+        return res.status(400).json({ error: 'Query parameter is required.' });
+      }
+      
+      // Build the base SQL query and parameters array.
+      let sqlQuery = `
+        SELECT 
+          c.id,
+          c.course_name,
+          c.course_type
+        FROM courses c
+        WHERE c.course_name ILIKE $1
+      `;
+      const params = [`%${query}%`];
+      
+      // If a course_type is provided, add an additional filter.
+      if (course_type) {
+        sqlQuery += ` AND LOWER(c.course_type) = LOWER($2)`;
+        params.push(course_type);
+      }
+      
+      // Append ORDER BY and LIMIT clauses.
+      sqlQuery += ` ORDER BY c.course_name LIMIT $${params.length + 1}`;
+      params.push(parseInt(limit, 10) || 5);
+      
+      const { rows } = await pool.query(sqlQuery, params);
+      res.json({ 
+        count: rows.length,
+        courses: rows 
+      });
     } catch (error) {
-        console.error('❌ Error searching courses:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+      console.error('❌ Error searching courses:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-});
+  });
+  
 
 // Move this route BEFORE any route with pattern /courses/:course_id/sections/:section_id
 router.put('/courses/:course_id/sections/reorder', async (req, res) => {
