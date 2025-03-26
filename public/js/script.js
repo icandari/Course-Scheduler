@@ -1128,3 +1128,5 @@ function selectOptimalElectives(electiveSections) {
   
   return selectedElectives;
 }
+
+//offical algorithim
