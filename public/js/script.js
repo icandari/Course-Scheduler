@@ -604,7 +604,7 @@ function createSchedule(classes, startSemester, majorClassLimit, fallWinterCredi
   return semesters;
 }
 
-// Improved selectClassesForSemester to fit more classes per semester
+// Improved selectClassesForSemester to keep corequisites together
 function selectClassesForSemester(
   availableClasses, 
   completedSemesters, 
@@ -636,86 +636,139 @@ function selectClassesForSemester(
     return true;
   });
   
+  // Build a corequisite lookup map for quick access
+  const coreqLookup = new Map();
+  
+  // Identify all corequisite relationships
+  eligibleClasses.forEach(cls => {
+    if (cls.corequisites && Array.isArray(cls.corequisites) && cls.corequisites.length > 0) {
+      const coreqIds = cls.corequisites
+        .map(coreq => typeof coreq === 'object' ? coreq.id || coreq.class_id : parseInt(coreq, 10))
+        .filter(id => !isNaN(id) && id > 0);
+      
+      if (coreqIds.length > 0) {
+        coreqLookup.set(cls.id, coreqIds);
+      }
+    }
+    
+    // Also check is_corequisite_for relationship
+    if (cls.is_corequisite_for) {
+      const parentId = parseInt(cls.is_corequisite_for, 10);
+      if (!isNaN(parentId) && parentId > 0) {
+        if (!coreqLookup.has(parentId)) {
+          coreqLookup.set(parentId, []);
+        }
+        coreqLookup.get(parentId).push(cls.id);
+      }
+    }
+  });
+  
   const selectedClasses = [];
   let currentCredits = 0;
   let majorClassesCount = 0;
   let religionClassesCount = 0;
   
-  // First select priority classes (especially religion!)
-  const eligiblePriorityClasses = priorityClasses.filter(cls => 
-    eligibleClasses.includes(cls) && !selectedClasses.includes(cls)
+  // Helper function to check if all corequisites for a class are eligible
+  function areCorequisitesEligible(classId) {
+    if (!coreqLookup.has(classId)) return true;
+    
+    const coreqIds = coreqLookup.get(classId);
+    return coreqIds.every(coreqId => 
+      eligibleClasses.some(c => c.id === coreqId) && 
+      !selectedClasses.some(c => c.id === coreqId)
+    );
+  }
+  
+  // Helper function to add a class with all its corequisites
+  function addClass(cls) {
+    // First check if we have room for this class and all its corequisites
+    const coreqsToAdd = getRequiredCorequisites(cls, eligibleClasses, selectedClasses);
+    const totalCredits = (cls.credits || 3) + coreqsToAdd.reduce((sum, c) => sum + (c.credits || 3), 0);
+    
+    if (currentCredits + totalCredits <= creditLimit) {
+      // Add the main class
+      selectedClasses.push(cls);
+      
+      // Add all its corequisites
+      selectedClasses.push(...coreqsToAdd);
+      
+      // Update credits
+      currentCredits += totalCredits;
+      
+      // Update counters
+      if (cls.isMajor) majorClassesCount++;
+      if (cls.category === 'religion') religionClassesCount++;
+      
+      // Update counters for corequisites
+      coreqsToAdd.forEach(coreq => {
+        if (coreq.isMajor) majorClassesCount++;
+        if (coreq.category === 'religion') religionClassesCount++;
+      });
+      
+      return true;
+    }
+    
+    return false;
+  }
+  
+  // Process priority classes first
+  // First religion priority classes
+  const religionPriorityClasses = priorityClasses.filter(cls => 
+    cls.category === 'religion' && 
+    eligibleClasses.includes(cls) && 
+    !selectedClasses.includes(cls) &&
+    areCorequisitesEligible(cls.id)
   );
   
-  // Process religion classes first within priorities
-  const religionPriorityClasses = eligiblePriorityClasses.filter(cls => cls.category === 'religion');
-  const otherPriorityClasses = eligiblePriorityClasses.filter(cls => cls.category !== 'religion');
-  
-  // Process religion priority classes - UPDATED to limit to 1 per semester
-  for (const cls of religionPriorityClasses) {
-    // Check if adding this class exceeds limits
-    if (currentCredits + (cls.credits || 3) <= creditLimit) {
-      if (religionClassesCount >= 1) continue; // CHANGED: Limit to 1 religion class per semester
-      religionClassesCount++;
-      
-      // Add class with its corequisites
-      const coreqsToAdd = getRequiredCorequisites(cls, eligibleClasses, selectedClasses);
-      const totalCredits = (cls.credits || 3) + coreqsToAdd.reduce((sum, c) => sum + (c.credits || 3), 0);
-      
-      if (currentCredits + totalCredits <= creditLimit) {
-        selectedClasses.push(cls);
-        selectedClasses.push(...coreqsToAdd);
-        currentCredits += totalCredits;
-      }
-    }
+  // Take only one religion class
+  if (religionPriorityClasses.length > 0 && religionClassesCount < 1) {
+    addClass(religionPriorityClasses[0]);
   }
   
-  // Then process other priority classes
+  // Then other priority classes
+  const otherPriorityClasses = priorityClasses.filter(cls => 
+    cls.category !== 'religion' && 
+    eligibleClasses.includes(cls) && 
+    !selectedClasses.includes(cls) &&
+    areCorequisitesEligible(cls.id)
+  );
+  
   for (const cls of otherPriorityClasses) {
-    // Check if adding this class exceeds limits
-    if (currentCredits + (cls.credits || 3) <= creditLimit) {
-      // Check religion limit
-      if (cls.category === 'religion') {
-        if (religionClassesCount >= 1) continue; // CHANGED: Limit to 1 religion class per semester
-        religionClassesCount++;
-      }
-      
-      // Check major class limit
-      if (cls.isMajor) {
-        if (majorClassesCount >= majorClassLimit) continue; // Skip if hit major class limit
-        majorClassesCount++;
-      }
-      
-      // Add class with its corequisites
-      const coreqsToAdd = getRequiredCorequisites(cls, eligibleClasses, selectedClasses);
-      const totalCredits = (cls.credits || 3) + coreqsToAdd.reduce((sum, c) => sum + (c.credits || 3), 0);
-      
-      if (currentCredits + totalCredits <= creditLimit) {
-        selectedClasses.push(cls);
-        selectedClasses.push(...coreqsToAdd);
-        currentCredits += totalCredits;
-        
-        // Update counts for added corequisites
-        coreqsToAdd.forEach(coreq => {
-          if (coreq.isMajor) majorClassesCount++;
-          if (coreq.category === 'religion') religionClassesCount++;
-        });
-      }
-    }
+    // Skip if we've hit limits
+    if (cls.category === 'religion' && religionClassesCount >= 1) continue;
+    if (cls.isMajor && majorClassesCount >= majorClassLimit) continue;
+    
+    addClass(cls);
+    
+    // Stop if we've hit credit limit
+    if (currentCredits >= creditLimit) break;
   }
   
-  // Next, select regular classes (not already selected)
+  // Next, select regular classes - prioritizing those with corequisites
   const remainingEligibleClasses = eligibleClasses.filter(cls => 
     !selectedClasses.includes(cls)
   );
   
-  // IMPROVED SORTING: Put more essential classes first
+  // Sort classes - prioritizing classes with corequisites to keep them together
   remainingEligibleClasses.sort((a, b) => {
-    // First prioritize religion classes to ensure they're taken early
+    // First prioritize classes with corequisites
+    const aHasCoreqs = coreqLookup.has(a.id) && coreqLookup.get(a.id).length > 0;
+    const bHasCoreqs = coreqLookup.has(b.id) && coreqLookup.get(b.id).length > 0;
+    
+    if (aHasCoreqs !== bHasCoreqs) {
+      return aHasCoreqs ? -1 : 1; // Classes with corequisites first
+    }
+    
+    // Then prioritize classes marked as is_elective and is_required (explicitly selected electives)
+    if (a.is_elective && a.is_required && !(b.is_elective && b.is_required)) return -1;
+    if (b.is_elective && b.is_required && !(a.is_elective && a.is_required)) return 1;
+    
+    // Then religion classes
     if ((a.category === 'religion') !== (b.category === 'religion')) {
       return a.category === 'religion' ? -1 : 1;
     }
     
-    // Then sort by required flag
+    // Then by required flag
     if (a.is_required !== b.is_required) {
       return a.is_required ? -1 : 1;
     }
@@ -725,14 +778,14 @@ function selectClassesForSemester(
       return a.isMajor ? -1 : 1;
     }
     
-    // Then by prerequisites count (classes with more prerequisites first)
+    // Rest of sorting remains the same...
     const prereqsA = (a.prerequisites && Array.isArray(a.prerequisites)) ? a.prerequisites.length : 0;
     const prereqsB = (b.prerequisites && Array.isArray(b.prerequisites)) ? b.prerequisites.length : 0;
     if (prereqsA !== prereqsB) {
       return prereqsB - prereqsA; // More prerequisites first
     }
     
-    // Then by class level (assuming format like "CS 101")
+    // Then by class level
     const levelA = a.class_number ? parseInt(a.class_number.match(/\d+/)?.[0] || '0', 10) : 0;
     const levelB = b.class_number ? parseInt(b.class_number.match(/\d+/)?.[0] || '0', 10) : 0;
     
@@ -741,36 +794,15 @@ function selectClassesForSemester(
   
   // Process remaining classes
   for (const cls of remainingEligibleClasses) {
-    // Check if adding this class exceeds limits
-    if (currentCredits + (cls.credits || 3) <= creditLimit) {
-      // Check religion limit
-      if (cls.category === 'religion') {
-        if (religionClassesCount >= 1) continue; // CHANGED: Limit to 1 religion class per semester
-        religionClassesCount++;
-      }
-      
-      // Check major class limit
-      if (cls.isMajor) {
-        if (majorClassesCount >= majorClassLimit) continue; // Skip if hit major class limit
-        majorClassesCount++;
-      }
-      
-      // Add class with its corequisites
-      const coreqsToAdd = getRequiredCorequisites(cls, eligibleClasses, selectedClasses);
-      const totalCredits = (cls.credits || 3) + coreqsToAdd.reduce((sum, c) => sum + (c.credits || 3), 0);
-      
-      if (currentCredits + totalCredits <= creditLimit) {
-        selectedClasses.push(cls);
-        selectedClasses.push(...coreqsToAdd);
-        currentCredits += totalCredits;
-        
-        // Update counts for added corequisites
-        coreqsToAdd.forEach(coreq => {
-          if (coreq.isMajor) majorClassesCount++;
-          if (coreq.category === 'religion') religionClassesCount++;
-        });
-      }
-    }
+    // Skip if we can't schedule all corequisites together
+    if (!areCorequisitesEligible(cls.id)) continue;
+    
+    // Skip if we've hit limits (except for corequisites)
+    if (cls.category === 'religion' && religionClassesCount >= 1) continue;
+    if (cls.isMajor && majorClassesCount >= majorClassLimit) continue;
+    
+    // Try to add the class with its corequisites
+    addClass(cls);
     
     // Stop if we've hit the credit limit
     if (currentCredits >= creditLimit) break;
