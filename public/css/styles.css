@@ -1430,4 +1430,24 @@ select:focus {
   color: #721c24;
 }
 
+/* Add this to your styles.css file */
+.export-button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 15px;
+  background-color: #c69214;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s;
+}
+
+.export-button:hover {
+  background-color: #d6a22f;
+}
+
 

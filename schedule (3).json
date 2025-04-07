@@ -1,0 +1,873 @@
+[
+  {
+    "name": "Winter 2025",
+    "type": "Winter",
+    "isFirstYear": true,
+    "classes": [
+      {
+        "id": 60,
+        "class_number": "STDEV 100R",
+        "class_name": "Holokai Foundations",
+        "credits": 1,
+        "category": "english",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 62,
+        "class_number": "EIL 201",
+        "class_name": "The Int'l Student in the University",
+        "credits": 2,
+        "category": "english",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 63,
+        "class_number": "EIL 313",
+        "class_name": "Listening/Speaking",
+        "credits": 4,
+        "category": "english",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 64,
+        "class_number": "EIL 317",
+        "class_name": "Reading/Writing",
+        "credits": 4,
+        "category": "english",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 50,
+        "class_number": "REL 100",
+        "class_name": "Intro to The Church of Jesus Christ of Latter-day Saints",
+        "credits": 2,
+        "category": "religion",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": true,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      }
+    ],
+    "totalCredits": 13
+  },
+  {
+    "name": "Spring 2025",
+    "type": "Spring",
+    "isFirstYear": true,
+    "classes": [
+      {
+        "id": 65,
+        "class_number": "EIL 320",
+        "class_name": "Academic English II",
+        "credits": 4,
+        "category": "english",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 55,
+        "class_number": "REL 121",
+        "class_name": "Book of Mormon I",
+        "credits": 2,
+        "category": "religion",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": true,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 72,
+        "class_number": "BIOL 112",
+        "class_name": "Biology I - Cell and Molecular Biology",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": true,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": [
+          73
+        ]
+      },
+      {
+        "id": 73,
+        "class_number": "BIOL 112L",
+        "class_name": "Biology I - Cell and Molecular Biology Lab",
+        "credits": 1,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": true,
+        "is_corequisite_for": 72,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": [
+          72
+        ]
+      }
+    ],
+    "totalCredits": 10
+  },
+  {
+    "name": "Fall 2025",
+    "type": "Fall",
+    "isFirstYear": true,
+    "classes": [
+      {
+        "id": 46,
+        "class_number": "REL 200",
+        "class_name": "The Eternal Family",
+        "credits": 2,
+        "category": "religion",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 1,
+        "class_number": "CS 101",
+        "class_name": "Introduction to Programming Fundamentals",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 26,
+        "class_number": "ENGL 101",
+        "class_name": "College Writing, Reading, and Research",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 20,
+        "class_number": "MATH 107",
+        "class_name": "Quantitative Reasoning",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 2,
+        "class_number": "IT 124",
+        "class_name": "Information Technology Essentials",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      }
+    ],
+    "totalCredits": 14
+  },
+  {
+    "name": "Winter 2026",
+    "type": "Winter",
+    "isFirstYear": true,
+    "classes": [
+      {
+        "id": 47,
+        "class_number": "REL 225",
+        "class_name": "Foundations of the Restoration",
+        "credits": 2,
+        "category": "religion",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 21,
+        "class_number": "MATH 121",
+        "class_name": "Principles of Statistics",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          20
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 3,
+        "class_number": "CS 140",
+        "class_name": "Web Design",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 4,
+        "class_number": "CS 202",
+        "class_name": "Introduction to Object-Oriented Programming",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          1
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 8,
+        "class_number": "CS 205",
+        "class_name": "Foundations of Discrete Mathematics",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          1
+        ],
+        "corequisites": []
+      }
+    ],
+    "totalCredits": 14
+  },
+  {
+    "name": "Spring 2026",
+    "type": "Spring",
+    "isFirstYear": true,
+    "classes": [
+      {
+        "id": 48,
+        "class_number": "REL 250",
+        "class_name": "Jesus Christ and the Everlasting Gospel",
+        "credits": 2,
+        "category": "religion",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 9,
+        "class_number": "CS 206",
+        "class_name": "Discrete Mathematics II",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          4,
+          8
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 22,
+        "class_number": "MATH 212",
+        "class_name": "Calculus I",
+        "credits": 5,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          21
+        ],
+        "corequisites": []
+      }
+    ],
+    "totalCredits": 10
+  },
+  {
+    "name": "Fall 2026",
+    "type": "Fall",
+    "isFirstYear": false,
+    "classes": [
+      {
+        "id": 51,
+        "class_number": "REL 261",
+        "class_name": "Family History (Genealogy)",
+        "credits": 2,
+        "category": "religion",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": true,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 11,
+        "class_number": "CS 300",
+        "class_name": "Advanced Object-Oriented Programming",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          4
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 5,
+        "class_number": "CS 250",
+        "class_name": "Database Applications",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 27,
+        "class_number": "ENGL 315",
+        "class_name": "Topics for Advanced Writing and Analysis",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          26
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 37,
+        "class_number": "PAIS 105",
+        "class_name": "Introduction to Pacific Studies",
+        "credits": 3,
+        "category": "minor",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      }
+    ],
+    "totalCredits": 14
+  },
+  {
+    "name": "Winter 2027",
+    "type": "Winter",
+    "isFirstYear": false,
+    "classes": [
+      {
+        "id": 49,
+        "class_number": "REL 275",
+        "class_name": "The Teachings and Doctrine of the Book of Mormon",
+        "credits": 2,
+        "category": "religion",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 12,
+        "class_number": "CS 301",
+        "class_name": "Algorithms and Complexity",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          9,
+          11
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 13,
+        "class_number": "CS 320",
+        "class_name": "Introduction to Computational Theory",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          9
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 10,
+        "class_number": "CS 210",
+        "class_name": "Computer Organization",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          4
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 6,
+        "class_number": "CS 311",
+        "class_name": "Systems Engineering",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          4,
+          5
+        ],
+        "corequisites": []
+      }
+    ],
+    "totalCredits": 14
+  },
+  {
+    "name": "Spring 2027",
+    "type": "Spring",
+    "isFirstYear": false,
+    "classes": [
+      {
+        "id": 16,
+        "class_number": "CS 420",
+        "class_name": "Programming Languages",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          12,
+          13
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 7,
+        "class_number": "HIST 470",
+        "class_name": "History and Ethics of Computing",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          27
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 35,
+        "class_number": "HTM 133",
+        "class_name": "Introduction to Hospitality and Tourism Management",
+        "credits": 3,
+        "category": "minor",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": true,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      }
+    ],
+    "totalCredits": 9
+  },
+  {
+    "name": "Fall 2027",
+    "type": "Fall",
+    "isFirstYear": false,
+    "classes": [
+      {
+        "id": 15,
+        "class_number": "CS 415",
+        "class_name": "Operating Systems Design",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          10,
+          12
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 17,
+        "class_number": "CS 490R - Game Design",
+        "class_name": "Advanced Topics in Computer Science",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": true,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          12
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 14,
+        "class_number": "CS 401",
+        "class_name": "Computer Science Proficiency",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          5,
+          11
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 28,
+        "class_number": "ENTR 180",
+        "class_name": "New Venture Finance",
+        "credits": 3,
+        "category": "minor",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 38,
+        "class_number": "PAIS 200",
+        "class_name": "Recognizing Place, Purpose, and Positionality on Native Land",
+        "credits": 3,
+        "category": "minor",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          37
+        ],
+        "corequisites": []
+      }
+    ],
+    "totalCredits": 15
+  },
+  {
+    "name": "Winter 2028",
+    "type": "Winter",
+    "isFirstYear": false,
+    "classes": [
+      {
+        "id": 18,
+        "class_number": "CS 490R - Data Visualization",
+        "class_name": "Advanced Topics in Computer Science",
+        "credits": 3,
+        "category": "major",
+        "isMajor": true,
+        "is_required": true,
+        "is_elective": true,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          12
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 41,
+        "class_number": "PAIS 250",
+        "class_name": "Polynesian Dance and Performance",
+        "credits": 3,
+        "category": "minor",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": true,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 29,
+        "class_number": "ENTR 275",
+        "class_name": "Leadership and the Gospel of Jesus Christ: Becoming a Disciple Leader",
+        "credits": 3,
+        "category": "minor",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 42,
+        "class_number": "PAIS 275",
+        "class_name": "Pacific Wood Carving",
+        "credits": 3,
+        "category": "minor",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": true,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [],
+        "corequisites": []
+      },
+      {
+        "id": 30,
+        "class_number": "ENTR 283",
+        "class_name": "New Venture Creation",
+        "credits": 3,
+        "category": "minor",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          28
+        ],
+        "corequisites": []
+      }
+    ],
+    "totalCredits": 15
+  },
+  {
+    "name": "Spring 2028",
+    "type": "Spring",
+    "isFirstYear": false,
+    "classes": [
+      {
+        "id": 31,
+        "class_number": "ENTR 285",
+        "class_name": "New Venture Growth Strategies",
+        "credits": 3,
+        "category": "minor",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          28
+        ],
+        "corequisites": []
+      }
+    ],
+    "totalCredits": 3
+  },
+  {
+    "name": "Fall 2028",
+    "type": "Fall",
+    "isFirstYear": false,
+    "classes": [
+      {
+        "id": 32,
+        "class_number": "ENTR 483",
+        "class_name": "New Venture Management",
+        "credits": 3,
+        "category": "minor",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": false,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          30,
+          31
+        ],
+        "corequisites": []
+      },
+      {
+        "id": 43,
+        "class_number": "PAIS 320",
+        "class_name": "Peace and Conflict in the Pacific",
+        "credits": 3,
+        "category": "minor",
+        "isMajor": false,
+        "is_required": true,
+        "is_elective": true,
+        "is_corequisite": false,
+        "is_corequisite_for": null,
+        "is_prerequisite_for": null,
+        "prerequisites": [
+          37
+        ],
+        "corequisites": []
+      }
+    ],
+    "totalCredits": 6
+  }
+]
