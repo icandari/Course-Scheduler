@@ -10,13 +10,12 @@
       rel="stylesheet"
     />
     <!-- Add shared component styles -->
-    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/components.css" />
     <link rel="stylesheet" href="/css/styles.css" />
     <link
       rel="stylesheet"
       href="https://unpkg.com/swiper/swiper-bundle.min.css"
     />
-    
   </head>
 
   <body>
@@ -30,52 +29,47 @@
         alt="BYUH Logo"
       />
       <!-- Admin login positioned right -->
-      
     </div>
 
     <div class="menu-spacer"></div>
-    
+
     <!-- Red background with images -->
     <div id="red-background">
-      <img src="./assets/turtle.png" alt="">
-      <img src="./assets/hawaiiandesign.png" alt="">
+      <img src="./assets/turtle.png" alt="" />
+      <img src="./assets/hawaiiandesign.png" alt="" />
     </div>
 
     <div class="background-image">
-     
       <!-- Start of the container -->
       <div class="container">
         <header class="floating-bar">
-          <!-- Replace the major search input with a dropdown -->
+          <!-- Major Dropdown -->
           <div class="input-group" id="major-search-group">
             <label for="majorSelect">Major:</label>
             <select id="majorSelect">
               <option value="">Select a Major</option>
               <!-- Options will be populated by JavaScript -->
             </select>
-            <!-- Keep the hidden input for ID storage -->
             <input type="hidden" id="selectedMajor" />
           </div>
 
-          <!-- Replace the minor1 search input with a dropdown -->
+          <!-- Minor 1 Dropdown (initially disabled) -->
           <div class="input-group" id="minor1-search-group">
             <label for="minor1Select">Minor 1:</label>
-            <select id="minor1Select">
+            <select id="minor1Select" disabled>
               <option value="">Select Your First Minor</option>
               <!-- Options will be populated by JavaScript -->
             </select>
-            <!-- Keep the hidden input for ID storage -->
             <input type="hidden" id="selectedMinor1" />
           </div>
 
-          <!-- Replace the minor2 search input with a dropdown -->
+          <!-- Minor 2 Dropdown (initially disabled) -->
           <div class="input-group" id="minor2-search-group">
             <label for="minor2Select">Minor 2:</label>
-            <select id="minor2Select">
+            <select id="minor2Select" disabled>
               <option value="">Select Your Second Minor</option>
               <!-- Options will be populated by JavaScript -->
             </select>
-            <!-- Keep the hidden input for ID storage -->
             <input type="hidden" id="selectedMinor2" />
           </div>
 
@@ -133,7 +127,7 @@
           <div class="legend">
             <p><span class="legend-color type-major"></span> Major Classes</p>
             <p><span class="legend-color type-minor"></span> Minor Classes</p>
-            
+
             <p>
               <span class="legend-color type-eil"></span> EIL/Holokai Classes
             </p>
@@ -205,7 +199,6 @@
       <!-- End of the container -->
     </div>
 
-   
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="/js/script.js"></script>
   </body>

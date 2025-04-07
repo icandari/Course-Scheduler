@@ -49,6 +49,8 @@ window.addEventListener('DOMContentLoaded', async () => {
                 // Populate the form with current values
                 document.getElementById('edit-course-name').value = courseData.course_name;
                 document.getElementById('edit-course-type').value = courseData.course_type;
+                // Set the holokai field value (if it exists, otherwise default to an empty string)
+                document.getElementById('edit-holokai').value = courseData.holokai || '';
                 
                 // Show the modal
                 editCourseModal.style.display = 'block';
@@ -58,13 +60,14 @@ window.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
-
+    
     editCourseForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const updatedData = {
             course_name: document.getElementById('edit-course-name').value,
-            course_type: document.getElementById('edit-course-type').value
+            course_type: document.getElementById('edit-course-type').value,
+            holokai: document.getElementById('edit-holokai').value  // New field added here
         };
     
         try {
@@ -213,30 +216,31 @@ window.addEventListener('DOMContentLoaded', async () => {
     function displayCourse(data) {
         // Calculate total credits in the course
         let totalCredits = 0;
-        
         if (data.sections && Array.isArray(data.sections)) {
-            data.sections.forEach(section => {
-                if (section.classes && Array.isArray(section.classes)) {
-                    section.classes.forEach(cls => {
-                        // Add credits from each class, with fallback to 0 if not available
-                        totalCredits += Number(cls.credits || 0);
-                    });
-                }
-            });
+          data.sections.forEach(section => {
+            if (section.classes && Array.isArray(section.classes)) {
+              section.classes.forEach(cls => {
+                totalCredits += Number(cls.credits || 0);
+              });
+            }
+          });
         }
-        
-        // Update the HTML to include credits
+      
+        // Update the HTML: course type, credits, and category are shown on one line.
+        // Using the same styling as defined in your stylesheet (#course-info h3 and .course-credits)
         courseInfoDiv.innerHTML = `
-            <h2>${data.course_name}</h2>
-            <h3>${data.course_type || 'N/A'} <span class="course-credits">•   ${totalCredits} Credits</span></h3>
-            <div class="editanddelete">
-                <img id="edit-course-button" src="./assets/whiteedit.png" alt="Edit course">
-                <img id="download-course-button" src="./assets/downloadcourse.png" alt="Download course">
-                <img id="delete-course-button" src="./assets/whitedelete.png" alt="Delete course">
-                <img id="copy-course-button" src="./assets/copy-button.png" alt="Duplicate course">
-
-
-            </div>
+          <h2>${data.course_name}</h2>
+          <h3>
+            ${data.course_type || 'null'}
+            <span class="course-credits">• ${totalCredits} Credits</span>
+            <span class="course-credits">• ${data.holokai || 'null'}</span>
+          </h3>
+          <div class="editanddelete">
+            <img id="edit-course-button" src="./assets/whiteedit.png" alt="Edit course">
+            <img id="download-course-button" src="./assets/downloadcourse.png" alt="Download course">
+            <img id="delete-course-button" src="./assets/whitedelete.png" alt="Delete course">
+            <img id="copy-course-button" src="./assets/copy-button.png" alt="Duplicate course">
+          </div>
         `;
 
         // Add this right after setting courseInfoDiv.innerHTML
@@ -252,6 +256,9 @@ window.addEventListener('DOMContentLoaded', async () => {
                     document.getElementById('edit-course-name').value = courseData.course_name;
                     document.getElementById('edit-course-type').value = courseData.course_type;
                     
+                    // Populate holokai field in edit modal
+                    document.getElementById('edit-holokai').value = courseData.holokai || '';
+                    
                     // Show the modal
                     const editCourseModal = document.getElementById('edit-course-modal');
                     editCourseModal.style.display = 'block';
@@ -262,7 +269,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-    
         if (editButton) {
             editButton.addEventListener('click', function() {
                 const editAndDelete = this.closest('.editanddelete');
@@ -271,7 +277,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // Add this right after creating the editButton event listener
         const deleteButton = document.getElementById('delete-course-button');
         if (deleteButton) {
             deleteButton.addEventListener('click', async () => {
@@ -286,7 +291,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                             throw new Error(errorData.error || 'Failed to delete course');
                         }
 
-                        // Redirect to search page after successful deletion
                         window.location.href = 'search.html';
                     } catch (error) {
                         console.error('Error deleting course:', error);
@@ -296,14 +300,11 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // Add this right after your deleteButton event listener setup in the displayCourse function
-
         const copyButton = document.getElementById('copy-course-button');
         if (copyButton) {
             copyButton.addEventListener('click', async () => {
                 if (confirm('Do you want to create a copy of this course with all its sections and classes?')) {
                     try {
-                        // Show loading state
                         copyButton.style.opacity = '0.5';
                         copyButton.style.cursor = 'wait';
                         
@@ -319,14 +320,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
                         const newCourse = await response.json();
                         
-                        // Success message and redirect to the new course
                         alert(`Course copied successfully! The new course is named "${newCourse.course_name}".`);
                         window.location.href = `course_details.html?course_id=${newCourse.id}`;
                     } catch (error) {
                         console.error('Error copying course:', error);
                         alert('Error copying course: ' + error.message);
-                        
-                        // Reset button state
                         copyButton.style.opacity = '1';
                         copyButton.style.cursor = 'pointer';
                     }
@@ -334,7 +332,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // Clear the sections div
         courseSectionsDiv.innerHTML = '';
         
         if (data.sections && Array.isArray(data.sections) && data.sections.length > 0) {
@@ -342,15 +339,13 @@ window.addEventListener('DOMContentLoaded', async () => {
                 if (section && section.id) {
                     const sectionDiv = document.createElement('div');
                     sectionDiv.className = 'course-section';
-                    sectionDiv.draggable = true; // Make draggable
+                    sectionDiv.draggable = true;
                     sectionDiv.dataset.sectionId = section.id;
                     sectionDiv.dataset.index = index;
                     
-                    // Add the drag handle
                     sectionDiv.innerHTML = `
                         <div class="drag-handle"></div>
                         <div class="section-header">
-                            <!-- Your existing header content -->
                             <div class="section-info-container">
                                 <h3 class="section-title">
                                     ${section.section_name}
@@ -364,10 +359,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                                 <button class="delete-section-button" data-section="${section.id}">Delete This Section</button>
                                 <img class="toggle-actions-button" src="./assets/editclassbutton.png" alt="Toggle actions" data-section="${section.id}">
                             </div>
-                            
-
                         </div>
-                        <!-- Rest of your section content -->
                         <ul class="classes-list" id="section-${section.id}-classes"></ul>
                         <div class="section-footer">
                             <div class="section-controls">
@@ -385,8 +377,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                     
                     courseSectionsDiv.appendChild(sectionDiv);
                     
-                    // Display classes for this section...
-                    // Your existing code for displaying classes
                     const sectionClassesList = document.getElementById(`section-${section.id}-classes`);
                     if (section.classes && section.classes.length > 0) {
                         section.classes.forEach(cls => {
@@ -414,38 +404,28 @@ window.addEventListener('DOMContentLoaded', async () => {
                 }
             });
     
-            // Add event listeners for the section-specific buttons
             attachSectionEventListeners();
-            
-            // Add drag and drop functionality
             initDragAndDrop();
         }
     
-        // Show add section button (always visible)
         addSectionButton.style.display = 'block';
     }
 
-    // Attach event listeners for section controls
     function attachSectionEventListeners() {
-        // Add existing class buttons
         document.querySelectorAll('.add-existing-class-button').forEach(button => {
             button.addEventListener('click', (e) => {
-                // Get the section ID from the button element itself, not the target
                 const sectionId = button.dataset.section;
                 showSearchContainer(sectionId);
             });
         });
 
-        // Add new class buttons
         document.querySelectorAll('.add-new-class-button').forEach(button => {
             button.addEventListener('click', (e) => {
-                // Get sectionId from the button's data attribute, not from e.target
                 const sectionId = button.dataset.section;
                 window.location.href = `add_new_class.html?course_id=${courseId}&section_id=${sectionId}`;
             });
         });
 
-        // Update class buttons
         document.querySelectorAll('.update-class-button').forEach(button => {
             button.addEventListener('click', (e) => {
                 const classId = e.target.dataset.classId;
@@ -454,15 +434,13 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
-        // Delete class buttons
-                document.querySelectorAll('.delete-class-button').forEach(button => {
+        document.querySelectorAll('.delete-class-button').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const classId = e.target.dataset.classId;
                 const sectionId = e.target.dataset.sectionId;
                 
                 if (confirm('Are you sure you want to remove this class from the section?')) {
                     try {
-                        // Update the URL to match the API endpoint
                         const response = await fetch(
                             `/api/courses/${courseId}/sections/${sectionId}/classes/${classId}`,
                             { method: 'DELETE' }
@@ -482,7 +460,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
-        // Delete section buttons
         document.querySelectorAll('.delete-section-button').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const sectionId = e.target.dataset.section;
@@ -508,7 +485,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
-        // Add search input listeners for each section
         document.querySelectorAll('.class-search-input').forEach(input => {
             input.addEventListener('input', (e) => {
                 const sectionId = e.target.closest('.section-controls')
@@ -519,18 +495,15 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
-        // Add this to your attachSectionEventListeners function
         document.querySelectorAll('.section-icon').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const sectionId = e.target.dataset.section;
                 
                 try {
-                    // Fetch current section data
                     const response = await fetch(`/api/courses/${courseId}/sections/${sectionId}`);
                     if (!response.ok) throw new Error('Failed to fetch section details');
                     const sectionData = await response.json();
                     
-                    // Populate the form with current values
                     document.getElementById('edit-section-name').value = sectionData.section_name;
                     document.getElementById('edit-section-type').value = sectionData.is_required ? 'required' : 'elective';
                     
@@ -541,10 +514,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                         editElectiveOptions.style.display = 'none';
                     }
                     
-                    // Set the section ID in the hidden field
                     document.getElementById('edit-section-id').value = sectionId;
-                    
-                    // Show the modal
                     editSectionModal.style.display = 'block';
                 } catch (error) {
                     console.error('Error fetching section details:', error);
@@ -553,42 +523,31 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
-        // Add this to your attachSectionEventListeners function
         document.querySelectorAll('.toggle-actions-button').forEach(button => {
             button.addEventListener('click', (e) => {
                 const sectionId = e.target.dataset.section;
                 const classList = document.getElementById(`section-${sectionId}-classes`);
                 const sectionElement = e.target.closest('.course-section');
                 
-                // Toggle the show-actions class on the section's classes list
                 classList.classList.toggle('show-actions');
-                
-                // Toggle active class on the section element to show/hide admin actions
                 sectionElement.classList.toggle('active');
-                
-                // Toggle the active class on the button itself
                 e.target.classList.toggle('active');
-                
-                // Rotate the image when toggled
                 e.target.style.transform = classList.classList.contains('show-actions') ? 
                     'rotate(180deg)' : 'rotate(0deg)';
             });
         });
     }
 
-    // Show/hide elective options based on section type selection
     editSectionTypeSelect.addEventListener('change', () => {
         editElectiveOptions.style.display = 
             editSectionTypeSelect.value === 'elective' ? 'block' : 'none';
     });
 
-    // Handle modal close
     document.getElementById('cancel-edit-section').addEventListener('click', () => {
         editSectionModal.style.display = 'none';
         editSectionForm.reset();
     });
 
-    // Close modal on outside click
     window.addEventListener('click', (event) => {
         if (event.target === editSectionModal) {
             editSectionModal.style.display = 'none';
@@ -596,7 +555,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Handle form submission
     editSectionForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -622,7 +580,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 throw new Error(errorData.error || 'Failed to update section');
             }
             
-            // Hide modal and refresh page to show updated data
             editSectionModal.style.display = 'none';
             location.reload();
         } catch (error) {
@@ -636,14 +593,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         const searchInput = searchModal.querySelector('.class-search-input');
         const searchResults = searchModal.querySelector('.search-results');
         
-        // Store the section ID as a data attribute
         searchModal.dataset.sectionId = sectionId;
-        
-        // Clear previous results
         searchInput.value = '';
         searchResults.innerHTML = '';
-        
-        // Show the modal
         searchModal.style.display = 'block';
         searchInput.focus();
     }
@@ -654,7 +606,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         const searchResults = searchModal.querySelector('.search-results');
         const query = searchInput.value.trim();
         
-        console.log('Performing search with query:', query); // Debug log
+        console.log('Performing search with query:', query);
         
         if (!query) {
             searchResults.innerHTML = '';
@@ -663,12 +615,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const response = await fetch(`/api/classes/search?query=${encodeURIComponent(query)}`);
-            console.log('Search response:', response); // Debug log
+            console.log('Search response:', response);
             
             if (!response.ok) throw new Error('Search failed');
 
             const data = await response.json();
-            console.log('Search results:', data); // Debug log
+            console.log('Search results:', data);
             
             displaySearchResults(data.classes, sectionId, searchResults);
         } catch (error) {
@@ -701,7 +653,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             searchResults.appendChild(li);
         });
 
-        // Update the event listeners for add buttons
         searchResults.querySelectorAll('.add-class-button').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const classId = button.dataset.classId;
@@ -737,34 +688,27 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Function to initialize drag and drop
     function initDragAndDrop() {
         const sections = document.querySelectorAll('.course-section');
         let draggedSection = null;
         
         sections.forEach(section => {
-            // Drag start event
             section.addEventListener('dragstart', (e) => {
                 draggedSection = section;
                 setTimeout(() => {
                     section.classList.add('dragging');
                 }, 0);
                 
-                // Set data transfer for drag operation
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', section.dataset.sectionId);
             });
             
-            // Drag end event
             section.addEventListener('dragend', () => {
                 section.classList.remove('dragging');
                 draggedSection = null;
-                
-                // Save the new order to the database
                 saveNewSectionOrder();
             });
             
-            // Drag over event - needed to allow dropping
             section.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 if (draggedSection === section) return;
@@ -772,7 +716,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 const box = section.getBoundingClientRect();
                 const offsetY = e.clientY - box.top - (box.height / 2);
                 
-                // Determine if we're before or after this section
                 if (offsetY < 0) {
                     section.classList.add('drag-over-top');
                     section.classList.remove('drag-over-bottom');
@@ -782,18 +725,15 @@ window.addEventListener('DOMContentLoaded', async () => {
                 }
             });
             
-            // Drag enter event
             section.addEventListener('dragenter', (e) => {
                 e.preventDefault();
                 if (draggedSection === section) return;
             });
             
-            // Drag leave event
             section.addEventListener('dragleave', () => {
                 section.classList.remove('drag-over-top', 'drag-over-bottom');
             });
             
-            // Drop event
             section.addEventListener('drop', (e) => {
                 e.preventDefault();
                 if (draggedSection === section) return;
@@ -804,20 +744,16 @@ window.addEventListener('DOMContentLoaded', async () => {
                 const offsetY = e.clientY - box.top - (box.height / 2);
                 
                 if (offsetY < 0) {
-                    // Drop before this section
                     courseSectionsDiv.insertBefore(draggedSection, section);
                 } else {
-                    // Drop after this section
                     courseSectionsDiv.insertBefore(draggedSection, section.nextSibling);
                 }
             });
         });
     }
 
-    // Function to save the new section order - DIRECT URL APPROACH
     async function saveNewSectionOrder() {
         try {
-            // Get all sections in their current DOM order
             const sections = document.querySelectorAll('.course-section');
             
             if (!sections || sections.length === 0) {
@@ -825,17 +761,14 @@ window.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             
-            // Ensure course ID is a pure number, not a string
             const courseIdInt = parseInt(courseId, 10);
             
             if (isNaN(courseIdInt) || courseIdInt <= 0) {
                 throw new Error('Invalid course ID');
             }
             
-            // Build section data manually with explicit integers
             const sectionDataArray = [];
             
-            // Use explicit loop to process each section
             for (let i = 0; i < sections.length; i++) {
                 const sectionIdRaw = sections[i].dataset.sectionId;
                 const sectionIdInt = parseInt(sectionIdRaw, 10);
@@ -851,7 +784,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 });
             }
             
-            // For debugging - print the exact request we're about to send
             const requestBody = JSON.stringify({
                 sections: sectionDataArray
             });
@@ -859,7 +791,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             console.log(`Sending request to /api/courses/${courseIdInt}/sections/reorder`);
             console.log(`Request body: ${requestBody}`);
             
-            // Make the request without any transformations after this point
             const response = await fetch(`/api/courses/${courseIdInt}/sections/reorder`, {
                 method: 'PUT',
                 headers: {
@@ -868,7 +799,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 body: requestBody
             });
             
-            // Get and log the raw response
             const responseText = await response.text();
             console.log('Raw API Response:', responseText);
             
@@ -892,25 +822,20 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Only use this if the above doesn't work
     async function saveNewSectionOrderAlternative() {
         try {
-            // Get all sections and their order
             const sections = document.querySelectorAll('.course-section');
             
             if (!sections || sections.length === 0) {
                 return;
             }
             
-            // Save each section order individually instead of in batch
             for (let i = 0; i < sections.length; i++) {
                 const sectionId = parseInt(sections[i].dataset.sectionId, 10);
                 const displayOrder = i + 1;
                 
-                // Skip invalid IDs
                 if (isNaN(sectionId)) continue;
                 
-                // Make individual update request for each section
                 await fetch(`/api/courses/${parseInt(courseId, 10)}/sections/${sectionId}`, {
                     method: 'PUT',
                     headers: {

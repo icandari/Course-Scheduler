@@ -1,129 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Course Details</title>
-    <link rel="stylesheet" href="/css/course_details.css?v=2">
+    <link rel="stylesheet" href="/css/course_details.css?v=2" />
     <script src="/js/course_details.js" defer></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-</head>
-<body>
-
+  </head>
+  <body>
     <a class="back-link" href="search.html">
-        <div class="back-button">
-            <img src="./assets/backbutton.png" alt="Back arrow">
-            <span>Back</span>
-        </div>
+      <div class="back-button">
+        <img src="./assets/backbutton.png" alt="Back arrow" />
+        <span>Back</span>
+      </div>
     </a>
-    
-    <div class='body-card'>
-        <div id="course-info">
-            <img src="./assets/polynesiandesign.png" alt="" class="background-design">
-            <h2>Course Name</h2>
-        </div>
-        <div id="course-sections"></div>
-        <div id="add-section-button">
-            <img src="./assets/newsection.png" alt="Add section">
-        </div>
+
+    <div class="body-card">
+      <div id="course-info">
+        <img
+          src="./assets/polynesiandesign.png"
+          alt=""
+          class="background-design"
+        />
+        <h2>Course Name</h2>
+      </div>
+      <div id="course-sections"></div>
+      <div id="add-section-button">
+        <img src="./assets/newsection.png" alt="Add section" />
+      </div>
     </div>
 
     <!-- Move modals outside of body-card -->
     <!-- Add Section Modal -->
     <div id="add-section-modal" class="modal">
-        <div class="modal-content">
-            <h2>Add New Section</h2>
-            <form id="add-section-form" class="modal-form">
-                <div>
-                    <label for="section-name">Section Name:</label>
-                    <input type="text" id="section-name" required>
-                </div>
-                <div>
-                    <label for="section-type">Section Type:</label>
-                    <select id="section-type" required>
-                        <option value="required">Required</option>
-                        <option value="elective">Elective</option>
-                    </select>
-                </div>
-                <div id="elective-options" style="display: none;">
-                    <label for="classes-to-choose">Credits Needed:</label>
-                    <input type="number" id="classes-to-choose" min="1" value="1">
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" id="cancel-section">Cancel</button>
-                    <button type="submit" id="save-section">Add Section</button>
-                </div>
-            </form>
-        </div>
+      <div class="modal-content">
+        <h2>Add New Section</h2>
+        <form id="add-section-form" class="modal-form">
+          <div>
+            <label for="section-name">Section Name:</label>
+            <input type="text" id="section-name" required />
+          </div>
+          <div>
+            <label for="section-type">Section Type:</label>
+            <select id="section-type" required>
+              <option value="required">Required</option>
+              <option value="elective">Elective</option>
+            </select>
+          </div>
+          <div id="elective-options" style="display: none">
+            <label for="classes-to-choose">Credits Needed:</label>
+            <input type="number" id="classes-to-choose" min="1" value="1" />
+          </div>
+          <div class="modal-buttons">
+            <button type="button" id="cancel-section">Cancel</button>
+            <button type="submit" id="save-section">Add Section</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Edit Course Modal -->
     <div id="edit-course-modal" class="modal">
-        <div class="modal-content">
-            <h2>Edit Course</h2>
-            <form id="edit-course-form" class="modal-form">
-                <div>
-                    <label for="edit-course-name">Course Name:</label>
-                    <input type="text" id="edit-course-name" required>
-                </div>
-                <div>
-                    <label for="edit-course-type">Course Type:</label>
-                    <select id="edit-course-type" required>
-                        <option value="major">Major</option>
-                        <option value="minor">Minor</option>
-                        <option value="religion">Religion</option>
-                        <option value="eil/holokai">EIL/Holokai</option>
-                    </select>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" id="cancel-edit-course">Cancel</button>
-                    <button type="submit" id="save-edit-course">Save Changes</button>
-                </div>
-            </form>
-        </div>
+      <div class="modal-content">
+        <h2>Edit Course</h2>
+        <form id="edit-course-form" class="modal-form">
+          <div>
+            <label for="edit-course-name">Course Name:</label>
+            <input type="text" id="edit-course-name" required />
+          </div>
+          <div>
+            <label for="edit-course-type">Course Type:</label>
+            <select id="edit-course-type" required>
+              <option value="major">Major</option>
+              <option value="minor">Minor</option>
+              <option value="religion">Religion</option>
+              <option value="eil/holokai">EIL/Holokai</option>
+            </select>
+          </div>
+          <div>
+            <label for="edit-holokai">Holokai Category:</label>
+            <select id="edit-holokai">
+              <option value="">Select a category</option>
+              <option value="Arts & Humanities">Arts & Humanities</option>
+              <option value="Math & Sciences">Math & Sciences</option>
+              <option value="Professional Studies">Professional Studies</option>
+            </select>
+          </div>
+          <div class="modal-buttons">
+            <button type="button" id="cancel-edit-course">Cancel</button>
+            <button type="submit" id="save-edit-course">Save Changes</button>
+          </div>
+        </form>
+      </div>
     </div>
-    
+
     <!-- Edit Section Modal -->
     <div id="edit-section-modal" class="modal">
-        <div class="modal-content">
-            <h2>Edit Section</h2>
-            <form id="edit-section-form" class="modal-form">
-                <div>
-                    <label for="edit-section-name">Section Name:</label>
-                    <input type="text" id="edit-section-name" required>
-                </div>
-                <div>
-                    <label for="edit-section-type">Section Type:</label>
-                    <select id="edit-section-type" required>
-                        <option value="required">Required</option>
-                        <option value="elective">Elective</option>
-                    </select>
-                </div>
-                <div id="edit-elective-options" style="display: none;">
-                    <label for="edit-classes-to-choose">Credits Needed:</label>
-                    <input type="number" id="edit-classes-to-choose" min="1" value="1">
-                </div>
-                <input type="hidden" id="edit-section-id">
-                <div class="modal-buttons">
-                    <button type="button" id="cancel-edit-section">Cancel</button>
-                    <button type="submit" id="save-edit-section">Save Changes</button>
-                </div>
-            </form>
-        </div>
+      <div class="modal-content">
+        <h2>Edit Section</h2>
+        <form id="edit-section-form" class="modal-form">
+          <div>
+            <label for="edit-section-name">Section Name:</label>
+            <input type="text" id="edit-section-name" required />
+          </div>
+          <div>
+            <label for="edit-section-type">Section Type:</label>
+            <select id="edit-section-type" required>
+              <option value="required">Required</option>
+              <option value="elective">Elective</option>
+            </select>
+          </div>
+          <div id="edit-elective-options" style="display: none">
+            <label for="edit-classes-to-choose">Credits Needed:</label>
+            <input
+              type="number"
+              id="edit-classes-to-choose"
+              min="1"
+              value="1"
+            />
+          </div>
+          <input type="hidden" id="edit-section-id" />
+          <div class="modal-buttons">
+            <button type="button" id="cancel-edit-section">Cancel</button>
+            <button type="submit" id="save-edit-section">Save Changes</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <div id="search-modal" class="modal">
-        <div class="modal-content search-modal-content">
-            <h2>Search Classes</h2>
-            <input type="text" class="class-search-input" placeholder="Search by Class Number">
-            <ul class="search-results"></ul>
-            <div class="modal-buttons">
-                <button id="close-search-modal">Cancel</button>
-            </div>
+      <div class="modal-content search-modal-content">
+        <h2>Search Classes</h2>
+        <input
+          type="text"
+          class="class-search-input"
+          placeholder="Search by Class Number"
+        />
+        <ul class="search-results"></ul>
+        <div class="modal-buttons">
+          <button id="close-search-modal">Cancel</button>
         </div>
+      </div>
     </div>
-
-</body>
+  </body>
 </html>

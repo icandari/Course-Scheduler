@@ -4,38 +4,46 @@
     <meta charset="UTF-8" />
     <title>Add a New Course</title>
     <script src="/js/add_course.js" defer></script>
-    <link rel="stylesheet" href="/css/admin.css">
-    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link rel="stylesheet" href="/css/components.css" />
     <script src="/js/partials.js"></script>
-</head>
-<header>
+  </head>
+  <header>
     <h1>Add a New Course</h1>
   </header>
   <body>
     <a href="search.html">Back to search</a>
     <div id="menu-container"></div>
     <div id="course-input">
-        <label for="courseName">Course Namexx:</label>
-        <input type="text" id="courseName" />
+      <label for="courseName">Course Namexx:</label>
+      <input type="text" id="courseName" />
 
-        <label for="courseCode">Course Type:</label>
-        <select id="courseType" name="courseType">
-          <option value="major">Major</option>
-          <option value="minor">Minor</option>
-          <option value="religion">Religion</option>
-          <option value="eil/holokai">EIL/Holokai</option>
-        </select>
+      <label for="courseCode">Course Type:</label>
+      <select id="courseType" name="courseType">
+        <option value="major">Major</option>
+        <option value="minor">Minor</option>
+        <option value="religion">Religion</option>
+        <option value="eil/holokai">EIL/Holokai</option>
+      </select>
 
-        <button id="addCourseButton">Add Course</button>
-      </div>
+      <!-- New Holokai Category field with updated options -->
+      <label for="courseHolokai">Holokai Category:</label>
+      <select id="courseHolokai" name="courseHolokai">
+        <option value="">Select a category</option>
+        <option value="Arts & Humanities">Arts & Humanities</option>
+        <option value="Math & Sciences">Math & Sciences</option>
+        <option value="Professional Studies">Professional Studies</option>
+      </select>
+
+      <button id="addCourseButton">Add Course</button>
     </div>
 
     <ul id="classes-list"></ul>
     <!-- The Add Class section will be injected here by course_details.js -->
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        loadPartial('/partials/menu-bar.html', 'menu-container');
+      document.addEventListener("DOMContentLoaded", function () {
+        loadPartial("/partials/menu-bar.html", "menu-container");
       });
     </script>
-</body>
+  </body>
 </html>

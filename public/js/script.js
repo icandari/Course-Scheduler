@@ -103,7 +103,7 @@ function createClassLookupMaps() {
   });
 }
 
-// Populate dropdowns with majors, minors and English levels
+// Populate dropdowns with majors, minors, and English levels
 function populateDropdowns(majors, minors, courses) {
   // Populate Major Dropdown
   const majorSelect = document.getElementById("majorSelect");
@@ -114,46 +114,37 @@ function populateDropdowns(majors, minors, courses) {
       option.value = major.id;
       option.textContent = major.course_name;
       majorSelect.appendChild(option);
-      
-      majorSelect.addEventListener('change', () => {
-        document.getElementById("selectedMajor").value = majorSelect.value;
-      });
+    });
+    // When a major is chosen, update hidden field and update Minor 1 dropdown
+    majorSelect.addEventListener('change', () => {
+      document.getElementById("selectedMajor").value = majorSelect.value;
+      updateMinor1Dropdown(minors);
     });
   }
-  
-  // Populate Minor 1 Dropdown
+
+  // Initially disable and clear Minor 1 Dropdown
   const minor1Select = document.getElementById("minor1Select");
   if (minor1Select) {
+    minor1Select.disabled = true;
     minor1Select.innerHTML = "<option value=''>Select Your First Minor</option>";
-    minors.forEach(minor => {
-      const option = document.createElement("option");
-      option.value = minor.id;
-      option.textContent = minor.course_name;
-      minor1Select.appendChild(option);
-      
-      minor1Select.addEventListener('change', () => {
-        document.getElementById("selectedMinor1").value = minor1Select.value;
-      });
+    // When Minor 1 changes, update hidden field and update Minor 2 dropdown
+    minor1Select.addEventListener('change', () => {
+      document.getElementById("selectedMinor1").value = minor1Select.value;
+      updateMinor2Dropdown(minors);
     });
   }
-  
-  // Populate Minor 2 Dropdown
+
+  // Initially disable and clear Minor 2 Dropdown
   const minor2Select = document.getElementById("minor2Select");
   if (minor2Select) {
+    minor2Select.disabled = true;
     minor2Select.innerHTML = "<option value=''>Select Your Second Minor</option>";
-    minors.forEach(minor => {
-      const option = document.createElement("option");
-      option.value = minor.id;
-      option.textContent = minor.course_name;
-      minor2Select.appendChild(option);
-      
-      minor2Select.addEventListener('change', () => {
-        document.getElementById("selectedMinor2").value = minor2Select.value;
-      });
+    minor2Select.addEventListener('change', () => {
+      document.getElementById("selectedMinor2").value = minor2Select.value;
     });
   }
-  
-  // Populate English Level Dropdown
+
+  // Populate English Level Dropdown (unchanged)
   const englishCourses = courses.filter(course =>
     course.course_type && course.course_type.toLowerCase() === "eil/holokai"
   );
@@ -168,6 +159,76 @@ function populateDropdowns(majors, minors, courses) {
     });
   }
 }
+
+// Update Minor 1 Dropdown based on selected major's category
+function updateMinor1Dropdown(minors) {
+  const majorSelect = document.getElementById("majorSelect");
+  const selectedMajorId = majorSelect.value;
+  const minor1Select = document.getElementById("minor1Select");
+
+  if (!selectedMajorId) {
+    // No major selected: disable and clear Minor 1
+    minor1Select.innerHTML = "<option value=''>Select Your First Minor</option>";
+    minor1Select.disabled = true;
+    // Also clear Minor 2
+    const minor2Select = document.getElementById("minor2Select");
+    minor2Select.innerHTML = "<option value=''>Select Your Second Minor</option>";
+    minor2Select.disabled = true;
+    return;
+  }
+  
+  // Find the selected major object in basicCourses (global variable)
+  const selectedMajor = basicCourses.find(course => String(course.id) === selectedMajorId);
+  const majorCategory = selectedMajor ? selectedMajor.holokai : null;
+  
+  // Filter minors: exclude those with the same holokai as the selected major
+  const filteredMinors = minors.filter(minor => minor.holokai !== majorCategory);
+  
+  // Populate Minor 1 Dropdown
+  minor1Select.innerHTML = "<option value=''>Select Your First Minor</option>";
+  filteredMinors.forEach(minor => {
+    const option = document.createElement("option");
+    option.value = minor.id;
+    option.textContent = minor.course_name;
+    minor1Select.appendChild(option);
+  });
+  minor1Select.disabled = false;
+  
+  // Reset Minor 2 Dropdown since Minor 1 has changed
+  const minor2Select = document.getElementById("minor2Select");
+  minor2Select.innerHTML = "<option value=''>Select Your Second Minor</option>";
+  minor2Select.disabled = true;
+}
+
+// Update Minor 2 Dropdown based on selected major and selected Minor 1
+function updateMinor2Dropdown(minors) {
+  const majorSelect = document.getElementById("majorSelect");
+  const selectedMajorId = majorSelect.value;
+  const selectedMajor = basicCourses.find(course => String(course.id) === selectedMajorId);
+  const majorCategory = selectedMajor ? selectedMajor.holokai : null;
+  
+  const minor1Select = document.getElementById("minor1Select");
+  const selectedMinor1Id = minor1Select.value;
+  const selectedMinor1 = minors.find(minor => String(minor.id) === selectedMinor1Id);
+  const minor1Category = selectedMinor1 ? selectedMinor1.holokai : null;
+  
+  const minor2Select = document.getElementById("minor2Select");
+  // Filter minors: exclude those with the same holokai as the major or Minor 1
+  const filteredMinors = minors.filter(minor => {
+    return minor.holokai !== majorCategory && minor.holokai !== minor1Category;
+  });
+  
+  // Populate Minor 2 Dropdown
+  minor2Select.innerHTML = "<option value=''>Select Your Second Minor</option>";
+  filteredMinors.forEach(minor => {
+    const option = document.createElement("option");
+    option.value = minor.id;
+    option.textContent = minor.course_name;
+    minor2Select.appendChild(option);
+  });
+  minor2Select.disabled = false;
+}
+
 
 // Main function to generate schedule from user selections - update to handle elective sections
 async function generateScheduleFromSelections(event) {
