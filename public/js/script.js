@@ -254,10 +254,16 @@ async function generateScheduleFromSelections(event) {
     
     // 7. Add required prerequisites and corequisites
     const allRequiredClasses = includePrerequisitesAndCorequisites(classesToSchedule);
-    
-    // 8. Generate the schedule (with religion prioritized earlier)
+
+    // Check for and log any duplicates
+    checkForDuplicateClasses(allRequiredClasses);
+
+    // After detecting duplicates but before generating schedule
+    const classesWithoutDuplicates = removeDuplicateClasses(allRequiredClasses);
+
+    // Generate the schedule with de-duplicated classes
     const schedule = createSchedule(
-      allRequiredClasses,
+      classesWithoutDuplicates,
       startSemester,
       majorClassLimit,
       fallWinterCredits,
@@ -266,7 +272,30 @@ async function generateScheduleFromSelections(event) {
     
     // 9. Display the schedule
     renderSchedule(schedule);
-    
+
+    // Export schedule as JSON for debugging
+    const scheduleJson = getScheduleAsJson(schedule);
+    console.log("Schedule JSON for debugging:", scheduleJson);
+
+    // Create a download button for the JSON
+    const exportButton = document.createElement('button');
+    exportButton.textContent = 'Export Schedule JSON';
+    exportButton.className = 'export-button';
+    exportButton.addEventListener('click', () => {
+      const blob = new Blob([scheduleJson], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'schedule.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // Add button after the schedule
+    document.getElementById('schedule-container').appendChild(exportButton);
+
   } catch (error) {
     console.error("Error generating schedule:", error);
     alert("There was an error generating your schedule. Please try again.");
@@ -421,6 +450,9 @@ function includePrerequisitesAndCorequisites(classes) {
     return map;
   }, {});
   
+  // Track processed corequisite relationships to prevent circular references
+  const processedCoreqPairs = new Set();
+  
   // Add prerequisites and their prerequisites recursively
   const allRequiredClassesById = {...selectedClassesById};
   let newClassesFound = true;
@@ -428,8 +460,9 @@ function includePrerequisitesAndCorequisites(classes) {
   while (newClassesFound) {
     newClassesFound = false;
     
-    // Check each class for prerequisites
+    // Check each class for prerequisites and corequisites
     Object.values(allRequiredClassesById).forEach(cls => {
+      // Handle prerequisites
       if (cls.prerequisites && Array.isArray(cls.prerequisites)) {
         cls.prerequisites.forEach(prereq => {
           // Extract ID and ensure it's an integer
@@ -440,7 +473,7 @@ function includePrerequisitesAndCorequisites(classes) {
             id = parseInt(prereq, 10);
           }
           
-          // Only proceed if ID is a valid number
+          // Only proceed if ID is a valid number and not already added
           if (!isNaN(id) && id > 0 && !allRequiredClassesById[id] && classesById[id]) {
             // Add the prerequisite class with inherited properties
             allRequiredClassesById[id] = {
@@ -455,7 +488,7 @@ function includePrerequisitesAndCorequisites(classes) {
         });
       }
       
-      // Check for corequisites
+      // Handle corequisites
       if (cls.corequisites && Array.isArray(cls.corequisites)) {
         cls.corequisites.forEach(coreq => {
           // Extract ID and ensure it's an integer
@@ -466,15 +499,29 @@ function includePrerequisitesAndCorequisites(classes) {
             id = parseInt(coreq, 10);
           }
           
-          // Only proceed if ID is a valid number
-          if (!isNaN(id) && id > 0 && !allRequiredClassesById[id] && classesById[id]) {
+          // Skip invalid IDs
+          if (isNaN(id) || id <= 0 || !classesById[id]) return;
+          
+          // Check for and handle bidirectional corequisites
+          // Create a unique key for this corequisite pair (sorted to be consistent regardless of order)
+          const pairKey = [cls.id, id].sort().join('-');
+          
+          // Skip if we've already processed this corequisite relationship
+          if (processedCoreqPairs.has(pairKey)) return;
+          
+          // Mark this relationship as processed
+          processedCoreqPairs.add(pairKey);
+          
+          // Only add if not already in the required classes
+          if (!allRequiredClassesById[id]) {
             // Add the corequisite class with inherited properties
             allRequiredClassesById[id] = {
               ...classesById[id],
               isMajor: cls.isMajor || false,
               category: cls.category || 'corequisite',
               is_required: true,
-              is_corequisite_for: cls.id
+              is_corequisite_for: cls.id,
+              is_corequisite: true  // Add flag to mark as corequisite
             };
             newClassesFound = true;
           }
@@ -716,8 +763,17 @@ function selectClassesForSemester(
   const completedClasses = completedSemesters.flatMap(sem => sem.classes);
   const completedClassIds = completedClasses.map(cls => cls.id);
   
+  // Calculate total credits completed so far
+  const totalCreditsCompleted = completedClasses.reduce((sum, cls) => sum + (cls.credits || 3), 0);
+  const isSeniorEligible = totalCreditsCompleted >= 90;
+  
   // Filter eligible classes that can be scheduled this semester
   const eligibleClasses = availableClasses.filter(cls => {
+    // Check if it's a senior class and if student has enough credits
+    if (cls.is_senior_class && !isSeniorEligible) {
+      return false;
+    }
+    
     // Check semester availability
     if (cls.semesters_offered && Array.isArray(cls.semesters_offered) && 
         cls.semesters_offered.length > 0) {
@@ -735,22 +791,6 @@ function selectClassesForSemester(
     }
     return true;
   });
-  
-  // If no eligible classes, try relaxing semester constraints
-  if (eligibleClasses.length === 0) {
-    console.warn(`No eligible classes for ${currentSemesterType} with strict constraints, relaxing...`);
-    
-    return availableClasses.filter(cls => {
-      // Only check prerequisites, ignore semester constraints
-      if (cls.prerequisites && Array.isArray(cls.prerequisites) && cls.prerequisites.length > 0) {
-        return cls.prerequisites.every(prereq => {
-          const prereqId = typeof prereq === 'object' ? prereq.id || prereq.class_id : prereq;
-          return isNaN(prereqId) || completedClassIds.includes(prereqId);
-        });
-      }
-      return true;
-    }).slice(0, 2); // Take at most 2 classes to make progress
-  }
   
   // Track selected classes for this semester
   const selectedClasses = [];
@@ -774,7 +814,7 @@ function selectClassesForSemester(
   
   // Helper function to add a class and its corequisites
   function addClassWithCorequisites(cls) {
-    // Get all required corequisites
+    // Get all required corequisites directly from the class definition
     const coreqsToAdd = [];
     
     if (cls.corequisites && Array.isArray(cls.corequisites) && cls.corequisites.length > 0) {
@@ -782,7 +822,9 @@ function selectClassesForSemester(
         const coreqId = typeof coreqRef === 'object' ? coreqRef.id || coreqRef.class_id : coreqRef;
         if (isNaN(coreqId)) return;
         
-        const coreqClass = eligibleClasses.find(c => c.id === coreqId);
+        // Find the corequisite in all available classes, not just eligible ones
+        // This ensures we don't miss corequisites that might have their own prerequisites
+        const coreqClass = availableClasses.find(c => c.id === coreqId);
         if (coreqClass && !selectedClasses.includes(coreqClass)) {
           coreqsToAdd.push(coreqClass);
         }
@@ -792,7 +834,7 @@ function selectClassesForSemester(
     // Calculate total credits needed
     const totalCredits = (cls.credits || 3) + coreqsToAdd.reduce((sum, c) => sum + (c.credits || 3), 0);
     
-    // Check if we can fit within credit limit
+    // Check if we can fit within credit limit (except for must-schedule classes)
     if (currentCredits + totalCredits > creditLimit && !cls.mustScheduleThisSemester) {
       return false;
     }
@@ -805,9 +847,16 @@ function selectClassesForSemester(
     if (cls.isMajor || cls.category === 'major') majorClassesCount++;
     if (cls.category === 'religion') religionClassesCount++;
     
-    // Add all corequisites
+    // Add all corequisites together
     coreqsToAdd.forEach(coreq => {
-      selectedClasses.push(coreq);
+      selectedClasses.push({
+        ...coreq,
+        isMajor: cls.isMajor || coreq.isMajor, // Inherit major status if needed
+        category: coreq.category || cls.category, // Keep original category or inherit
+        is_required: true,
+        is_corequisite_for: cls.id,
+        is_corequisite: true // Mark explicitly as corequisite
+      });
       currentCredits += (coreq.credits || 3);
       
       if (coreq.isMajor || coreq.category === 'major') majorClassesCount++;
@@ -1061,7 +1110,7 @@ function renderSchedule(schedule) {
   // Calculate total semesters
   const totalSemesters = schedule.length;
   
-  // Create summary items
+  // Create summary items (unchanged)
   summaryBox.innerHTML = `
     <div class="summary-item animated-box" id="total-credits-box">
       <p>Total Credits Taken</p>
@@ -1103,7 +1152,22 @@ function renderSchedule(schedule) {
     const classesList = document.createElement('ul');
     classesList.className = 'classes-list';
     
+    // NEW: Create a set to track displayed class numbers to avoid duplicates
+    const displayedClassNumbers = new Set();
+    
     semester.classes.forEach(cls => {
+      // NEW: Skip classes with duplicate class numbers in the same semester
+      const classNumber = cls.class_number || '';
+      if (classNumber && displayedClassNumbers.has(classNumber)) {
+        console.log(`Preventing duplicate display of ${classNumber} in ${semester.name}`);
+        return;
+      }
+      
+      // If we have a class number, mark it as displayed
+      if (classNumber) {
+        displayedClassNumbers.add(classNumber);
+      }
+      
       const classItem = document.createElement('li');
       classItem.className = 'class-item';
       
@@ -1114,7 +1178,7 @@ function renderSchedule(schedule) {
       
       classItem.innerHTML = `
         <span class="class-tag ${categoryTag}">${categoryTag.charAt(0).toUpperCase() + categoryTag.slice(1)}</span>
-        <span class="class-number">${cls.class_number || ''}</span>
+        <span class="class-number">${classNumber}</span>
         <span class="class-name">${cls.class_name}</span>
         <span class="class-credits">${cls.credits || 3} cr</span>
       `;
@@ -1160,7 +1224,7 @@ function selectOptimalElectives(electiveSections) {
       
       // Then by class level
       const levelA = a.class_number ? parseInt(a.class_number.match(/\d+/)?.[0] || '999', 10) : 999;
-      const levelB = b.class_number ? parseInt(a.class_number.match(/\d+/)?.[0] || '999', 10) : 999;
+      const levelB = b.class_number ? parseInt(b.class_number.match(/\d+/)?.[0] || '999', 10) : 999;
       return levelA - levelB; // Lower levels first
     });
     
@@ -1427,4 +1491,164 @@ function sortClassesByPriority(classes) {
     
     return levelA - levelB;
   });
+}
+
+// Add this function to check for duplicates before generating the schedule
+function checkForDuplicateClasses(classes) {
+  const classesById = {};
+  const duplicates = [];
+  
+  classes.forEach(cls => {
+    if (classesById[cls.id]) {
+      // Record full details about the duplicate for debugging
+      duplicates.push({
+        id: cls.id,
+        class_name: cls.class_name || "Unknown",
+        class_number: cls.class_number || "Unknown",
+        firstOrigin: classesById[cls.id].origin,
+        firstInstance: {
+          is_corequisite: classesById[cls.id].is_corequisite || false,
+          is_corequisite_for: classesById[cls.id].is_corequisite_for || null,
+          is_prerequisite_for: classesById[cls.id].is_prerequisite_for || null
+        },
+        secondOrigin: cls.is_corequisite_for ? 
+                      `Corequisite for ${cls.is_corequisite_for}` : 
+                      cls.is_prerequisite_for ? 
+                      `Prerequisite for ${cls.is_prerequisite_for}` : 
+                      'Direct requirement',
+        secondInstance: {
+          is_corequisite: cls.is_corequisite || false,
+          is_corequisite_for: cls.is_corequisite_for || null,
+          is_prerequisite_for: cls.is_prerequisite_for || null
+        }
+      });
+    } else {
+      classesById[cls.id] = {
+        ...cls,
+        origin: cls.is_corequisite_for ? 
+                `Corequisite for ${cls.is_corequisite_for}` : 
+                cls.is_prerequisite_for ? 
+                `Prerequisite for ${cls.is_prerequisite_for}` : 
+                'Direct requirement'
+      };
+    }
+  });
+  
+  if (duplicates.length > 0) {
+    console.warn('Duplicate classes found:', duplicates);
+    
+    // Log a more readable summary
+    duplicates.forEach(dup => {
+      console.warn(`Duplicate class: ${dup.class_number} - ${dup.class_name}`);
+      console.warn(`  First instance: ${dup.firstOrigin}`);
+      console.warn(`  Second instance: ${dup.secondOrigin}`);
+    });
+  }
+  
+  return duplicates.length > 0;
+}
+
+// Update the removeDuplicateClasses function with better debugging
+
+function removeDuplicateClasses(classes) {
+  console.log(`===== DUPLICATE CHECK: Starting with ${classes.length} classes =====`);
+  
+  // First, check if we even have any IDs to work with
+  const classesWithoutIds = classes.filter(cls => !cls.id);
+  if (classesWithoutIds.length > 0) {
+    console.warn(`WARNING: Found ${classesWithoutIds.length} classes without IDs!`, classesWithoutIds);
+  }
+  
+  // Create a map to track class counts by ID for debug purposes
+  const classCounts = {};
+  classes.forEach(cls => {
+    if (cls.id) {
+      classCounts[cls.id] = (classCounts[cls.id] || 0) + 1;
+    }
+  });
+  
+  // Find IDs that appear more than once
+  const duplicateIds = Object.entries(classCounts)
+    .filter(([_, count]) => count > 1)
+    .map(([id]) => parseInt(id));
+  
+  console.log(`Found ${duplicateIds.length} class IDs with duplicates`, duplicateIds);
+  
+  // Log details about duplicated classes
+  duplicateIds.forEach(id => {
+    const instances = classes.filter(cls => cls.id === id);
+    console.log(`Class ID ${id} appears ${instances.length} times:`);
+    instances.forEach((cls, idx) => {
+      console.log(`  Instance ${idx+1}: ${cls.class_number} - ${cls.class_name}`);
+      console.log(`    Is corequisite: ${cls.is_corequisite}`);
+      console.log(`    Is corequisite for: ${cls.is_corequisite_for || 'none'}`);
+      console.log(`    Is prerequisite for: ${cls.is_prerequisite_for || 'none'}`);
+    });
+  });
+  
+  // Now do the actual deduplication
+  const uniqueClasses = [];
+  const addedIds = new Set();
+  
+  for (const cls of classes) {
+    if (!cls.id || !addedIds.has(cls.id)) {
+      if (cls.id) {
+        addedIds.add(cls.id);
+      }
+      uniqueClasses.push(cls);
+    } else {
+      console.log(`Removed duplicate class: ${cls.class_number || 'Unknown'} (ID: ${cls.id})`);
+    }
+  }
+  
+  console.log(`===== DUPLICATE CHECK: Removed ${classes.length - uniqueClasses.length} duplicates, returning ${uniqueClasses.length} classes =====`);
+  return uniqueClasses;
+}
+
+// Add after renderSchedule function
+
+// Function to export schedule as JSON for debugging
+function getScheduleAsJson(schedule) {
+  // Before creating the clean schedule, deduplicate classes in each semester
+  const deduplicatedSchedule = schedule.map(semester => {
+    const uniqueClasses = [];
+    const addedIds = new Set();
+    
+    for (const cls of semester.classes) {
+      if (!addedIds.has(cls.id)) {
+        uniqueClasses.push(cls);
+        addedIds.add(cls.id);
+      }
+    }
+    
+    return {
+      ...semester,
+      classes: uniqueClasses
+    };
+  });
+  
+  // Then proceed with creating the clean version
+  const cleanSchedule = deduplicatedSchedule.map(semester => ({
+    name: semester.name,
+    type: semester.type,
+    isFirstYear: semester.isFirstYear,
+    classes: semester.classes.map(cls => ({
+      id: cls.id,
+      class_number: cls.class_number || 'Unknown',
+      class_name: cls.class_name || 'Unknown',
+      credits: cls.credits || 3,
+      category: cls.category || '',
+      isMajor: cls.isMajor || false,
+      is_required: cls.is_required || false,
+      is_elective: cls.is_elective || false,
+      is_corequisite: cls.is_corequisite || false,
+      is_corequisite_for: cls.is_corequisite_for || null,
+      is_prerequisite_for: cls.is_prerequisite_for || null,
+      prerequisites: cls.prerequisites || [],
+      corequisites: cls.corequisites || []
+    })),
+    totalCredits: semester.classes.reduce((sum, cls) => sum + (cls.credits || 3), 0)
+  }));
+
+  return JSON.stringify(cleanSchedule, null, 2); // Pretty-print with 2-space indentation
 }
