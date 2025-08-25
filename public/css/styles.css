@@ -65,6 +65,7 @@ body{
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /* Header: always a fixed top bar */
 .site-header{
   position:fixed; top:0; left:0; right:0;
@@ -75,6 +76,8 @@ body{
 }
 .logo{ height:70px; width:auto; display:block; }
 =======
+=======
+>>>>>>> 9897865 (new ui)
 /* Header: vertical on desktop, horizontal at mobile */
 .site-header{
   position:fixed; inset:0 auto 0 0; /* top:0; bottom:0; left:0 */
@@ -84,6 +87,9 @@ body{
   padding:16px 0; z-index:60; box-shadow:0 3px 7px rgba(0,0,0,.10);
 }
 .logo{ height:100px; width:auto; display:block; }
+<<<<<<< HEAD
+>>>>>>> 9897865 (new ui)
+=======
 >>>>>>> 9897865 (new ui)
 
 /* Burger button (hidden on desktop) */
@@ -107,8 +113,12 @@ body{
   max-width: calc(var(--app-max-w-base) * var(--ui-scale));
   margin:40px auto 80px;
 <<<<<<< HEAD
+<<<<<<< HEAD
   /* top padding to clear header, remove sidebar offset */
   padding:72px 16px 60px 16px;
+=======
+  padding:0 16px 0 calc(var(--sidebar-w) + 16px); /* leave room for sidebar */
+>>>>>>> 9897865 (new ui)
 =======
   padding:0 16px 0 calc(var(--sidebar-w) + 16px); /* leave room for sidebar */
 >>>>>>> 9897865 (new ui)
@@ -145,6 +155,7 @@ h1,h2,h3,h4,h5,h6,
   padding:28px 24px;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 /* Constraints layout */
 .constraints-layout{
@@ -241,6 +252,8 @@ h1,h2,h3,h4,h5,h6,
 /* Disabled look for selects when limited is off */
 .select-control:disabled{ background:#f3f4f6; color:#9ca3af; cursor:not-allowed; }
 
+=======
+>>>>>>> 9897865 (new ui)
 =======
 >>>>>>> 9897865 (new ui)
 /* Holokai card: more inner spacing */
@@ -341,7 +354,11 @@ h1,h2,h3,h4,h5,h6,
 .sd-input{
   width:100%;
 <<<<<<< HEAD
+<<<<<<< HEAD
   height: calc(var(--control-h) * .85); /* make shorter */
+=======
+  height:var(--control-h);
+>>>>>>> 9897865 (new ui)
 =======
   height:var(--control-h);
 >>>>>>> 9897865 (new ui)
@@ -475,10 +492,13 @@ h1,h2,h3,h4,h5,h6,
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /* At tablet and below, slightly reduce side padding */
 @media (max-width: 900px){
   .app{ padding:72px 12px 60px 12px; }
 =======
+=======
+>>>>>>> 9897865 (new ui)
 /* At tablet and below, convert header to top horizontal bar */
 @media (max-width: 900px){
   .site-header{
@@ -488,6 +508,9 @@ h1,h2,h3,h4,h5,h6,
   }
   .logo{ height:70px; }
   .app{ padding:72px 12px 60px 12px; } /* top padding to clear header, remove sidebar offset */
+<<<<<<< HEAD
+>>>>>>> 9897865 (new ui)
+=======
 >>>>>>> 9897865 (new ui)
 }
 
