@@ -58,3 +58,17 @@ function initializePartialScripts(partialContainerId) {
     });
   }
 }
+
+/**
+ * Mount the header partial into a container with the given ID.
+ * Creates the container at the top of <body> if it does not exist.
+ */
+async function mountHeader(containerId = 'header-container'){
+  let el = document.getElementById(containerId);
+  if(!el){
+    el = document.createElement('div');
+    el.id = containerId;
+    document.body.prepend(el);
+  }
+  await loadPartial('/partials/header.html', containerId);
+}
