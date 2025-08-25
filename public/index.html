@@ -7,11 +7,34 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <!-- Shoelace (buttons, icon-button) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/themes/light.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- Shoelace (buttons, icon-button) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/themes/light.css" />
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
   <body>
 
+  <div id="header-container"></div>
+    <main class="app">
+      <h1 class="app-title">Holokai Planner</h1>
+
+  <!-- Title outside the card -->
+  <h2 class="section-title" id="holokai-title">1. Choose your Holokai</h2>
+
+  <section class="card" id="step-holokai">
+        <button class="card-help" type="button" aria-label="Help" title="Help">?</button>
+
+        <div class="grid-3">
+          <!-- Major -->
+          <div class="field">
+            <label for="major-input">Major</label>
+            <div class="sd" id="major-dd">
+              <input id="major-input" class="sd-input" type="text" placeholder="Search majors..." autocomplete="off" />
+              <div class="sd-list" id="major-list"></div>
+              <input type="hidden" id="major-id" />
             </div>
+            <!-- square until filled -->
+            <div class="preview square" id="major-preview">No course selected</div>
             <!-- square until filled -->
             <div class="preview square" id="major-preview">No course selected</div>
           </div>
@@ -143,6 +166,14 @@
             <div class="field field-inline">
               <label for="limit-year1">Limit First Year Credits</label>
               <input id="limit-year1" type="checkbox" checked />
+
+          <!-- Minor 1 -->
+          <div class="field">
+            <label for="minor1-input">Minor 1</label>
+            <div class="sd" id="minor1-dd">
+              <input id="minor1-input" class="sd-input" type="text" placeholder="Search minors..." autocomplete="off" />
+              <div class="sd-list" id="minor1-list"></div>
+              <input type="hidden" id="minor1-id" />
             </div>
 
             <div class="fields-row">
@@ -167,6 +198,8 @@
               <button id="export-btn" class="btn export" type="button">Export</button>
               <button id="next-btn-constraints" class="btn next" type="button">Generate</button>
             </div>
+            <!-- square until filled -->
+            <div class="preview square" id="minor1-preview">No course selected</div>
           </div>
 
           <!-- Box 3: Ask AI -->
@@ -175,7 +208,16 @@
             <div class="constraints-chat">
               <textarea id="ai-prompt" rows="3" placeholder="Ask AI to rearrange your schedule..."></textarea>
               <button id="ai-submit" class="btn next" type="button">Change with AI</button>
+          <!-- Minor 2 -->
+          <div class="field">
+            <label for="minor2-input">Minor 2</label>
+            <div class="sd" id="minor2-dd">
+              <input id="minor2-input" class="sd-input" type="text" placeholder="Search minors..." autocomplete="off" />
+              <div class="sd-list" id="minor2-list"></div>
+              <input type="hidden" id="minor2-id" />
             </div>
+            <!-- square until filled -->
+            <div class="preview square" id="minor2-preview">No course selected</div>
           </div>
         </aside>
 
@@ -188,7 +230,30 @@
 
   <script src="/js/partials.js"></script>
   <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/shoelace.js"></script>
+
+        <div class="legend">
+          <span class="item"><span class="dot red"></span> Arts & Humanities</span>
+          <span class="item"><span class="dot silver"></span> Professional Studies</span>
+          <span class="item"><span class="dot gold"></span> Math & Sciences</span>
+        </div>
+      </section>
+
+      <!-- Next button outside the box -->
+      <div class="actions actions-outside">
+        <button id="next-btn" class="btn next" disabled>Next</button>
+      </div>
+    </main>
+
+  <script src="/js/partials.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/shoelace.js"></script>
     <script src="/js/script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        if (typeof mountHeader === 'function') {
+          mountHeader('header-container');
+        }
+      });
+    </script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         if (typeof mountHeader === 'function') {
