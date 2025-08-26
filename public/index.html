@@ -4,344 +4,197 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Holokai Planner</title>
-    <!-- Add Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Add shared component styles -->
-    <link rel="stylesheet" href="/css/components.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- Shoelace (buttons, icon-button) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/themes/light.css" />
     <link rel="stylesheet" href="/css/styles.css" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/swiper/swiper-bundle.min.css"
-    />
-    
   </head>
-
   <body>
-    <!-- Updated menubar with styled Admin Login link -->
-    <div id="menubar">
-      <!-- BYUH logo on left -->
-      <img
-        class="icon left"
-        id="morebutton"
-        src="./assets/byuhawaii.png"
-        alt="BYUH Logo"
-      />
-      
-      <!-- Navigation buttons -->
-      <!-- <div class="menu-links">
-        <a href="/change_plan.html" class="menu-button">Change Your Plan</a>
-      </div>
-       -->
-      <!-- Admin login positioned right -->
-    </div>
 
-    <div class="menu-spacer"></div>
-    
-    <!-- Red background with images -->
-    <div id="red-background">
-      <img src="./assets/turtle.png" alt="">
-      <img src="./assets/hawaiiandesign.png" alt="">
-    </div>
-
-    <div class="background-image">
-     
-      <!-- Start of the container -->
-      <div class="container">
-        <header class="floating-bar" id="welcome-screen">
-          <div class="welcome-container">
-            <h2 class="welcome-title">Welcome to Holokai Planner</h2>
-            <p class="welcome-text">Choose how you would like to create your college path:</p>
-            
-            <div class="path-options">
-              <button id="semesters-path-btn" class="path-button">
-                <i class="fa fa-calendar"></i>
-                Create college path by number of semesters
-              </button>
-              
-              <button id="credits-path-btn" class="path-button">
-                <i class="fa fa-graduation-cap"></i>
-                Create colleger hello there  path by credits per semester s
-              </button>
             </div>
-          </div>
-        </header>
-
-        <!-- Original menu (now hidden initially) -->
-        <header class="floating-bar hidden" id="credits-based-menu">
-          <!-- Back button -->
-          <div class="back-button-container">
-            <button class="back-button" id="credits-back-btn" title="Back to Options">
-            </button>
-          </div>
-          
-          <!-- Original content -->
-          <div class="input-group" id="major-search-group">
-            <label for="majorSelect">Major:</label>
-            <select id="majorSelect">
-              <option value="">Select a Major</option>
-              <!-- Options will be populated by JavaScript -->
-            </select>
-            <!-- Keep the hidden input for ID storage -->
-            <input type="hidden" id="selectedMajor" name="selectedMajor" value="">
-            <!-- Add holokai display element -->
-            <div id="majorHolokai" class="holokai-info"></div>
+            <!-- square until filled -->
+            <div class="preview square" id="major-preview">No course selected</div>
           </div>
 
-          <div class="input-group" id="minor1-search-group">
-            <label for="minor1Select">Minor 1:</label>
-            <select id="minor1Select">
-              <option value="">Select Your First Minor</option>
-              <!-- Options will be populated by JavaScript -->
-            </select>
-            <!-- Keep the hidden input for ID storage -->
-            <input type="hidden" id="selectedMinor1" name="selectedMinor1" value="">
-            <!-- Add holokai display element -->
-            <div id="minor1Holokai" class="holokai-info"></div>
-          </div>
-
-          <div class="input-group" id="minor2-search-group">
-            <label for="minor2Select">Minor 2:</label>
-            <select id="minor2Select">
-              <option value="">Select Your Second Minor</option>
-              <!-- Options will be populated by JavaScript -->
-            </select>
-            <!-- Keep the hidden input for ID storage -->
-            <input type="hidden" id="selectedMinor2" name="selectedMinor2" value="">
-            <!-- Add holokai display element -->
-            <div id="minor2Holokai" class="holokai-info"></div>
-          </div>
-
-          <div class="input-group">
-            <label for="english-level">English Level:</label>
-            <select id="english-level"></select>
-          </div>
-
-          <div class="input-group">
-            <label for="start-semester">Starting Semester:</label>
-            <select id="start-semester">
-              <option value="Winter 2025">Winter 2025</option>
-              <option value="Spring 2025">Spring 2025</option>
-              <option value="Fall 2025">Fall 2025</option>
-              <option value="Winter 2026">Winter 2026</option>
-              <option value="Spring 2026">Spring 2026</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label for="major-class-limit">Max Major Classes Per Sem:</label>
-            <select id="major-class-limit">
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4" selected>4</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label for="fall-winter-credits">Max Fall/Winter Credits:</label>
-            <select id="fall-winter-credits">
-              <option value="12">12</option>
-              <option value="13">13</option>
-              <option value="14">14</option>
-              <option value="15">15</option>
-              <option value="16" selected>16</option>
-              <option value="17">17</option>
-              <option value="18">18</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label for="spring-credits">Max Spring Credits:</label>
-            <select id="spring-credits">
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10" selected>10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-            </select>
-          </div>
-
-          <div class="input-group checkbox-group">
-            <label for="limit-first-year-credits">
-              <input type="checkbox" id="limit-first-year-credits"> Limit First Year Credits
-            </label>
-          </div>
-
-          <div class="legend">
-            <p><span class="legend-color type-major"></span> Major Classes</p>
-            <p><span class="legend-color type-minor"></span> Minor Classes</p>
-            
-            <p>
-              <span class="legend-color type-eil"></span> EIL/Holokai Classes
-            </p>
-            <p>
-              <span class="legend-color type-religion"></span> Religion Classes
-            </p>
-          </div>
-
-          <button id="calculate-schedule">Generate Schedule</button>
-        </header>
-
-        <!-- Semesters-based menu (hidden initially) -->
-        <header class="floating-bar hidden" id="semesters-based-menu">
-          <!-- Back button -->
-          <div class="back-button-container">
-            <button class="back-button" id="semesters-back-btn" title="Back to Options">
-            </button>
-          </div>
-          
-          <!-- Modified content for semesters approach -->
-          <div class="input-group" id="major-search-group-sem">
-            <label for="majorSelect-sem">Major:</label>
-            <select id="majorSelect-sem">
-              <option value="">Select a Major</option>
-              <!-- Options will be populated by JavaScript -->
-            </select>
-            <input type="hidden" id="selectedMajor-sem" name="selectedMajor" value="">
-            <div id="majorHolokai-sem" class="holokai-info"></div>
-          </div>
-
-          <!-- Minor 1 dropdown -->
-          <div class="input-group" id="minor1-search-group-sem">
-            <label for="minor1Select-sem">Minor 1:</label>
-            <select id="minor1Select-sem">
-              <option value="">Select Your First Minor</option>
-            </select>
-            <input type="hidden" id="selectedMinor1-sem" name="selectedMinor1" value="">
-            <div id="minor1Holokai-sem" class="holokai-info"></div>
-          </div>
-
-          <!-- Minor 2 dropdown -->
-          <div class="input-group" id="minor2-search-group-sem">
-            <label for="minor2Select-sem">Minor 2:</label>
-            <select id="minor2Select-sem">
-              <option value="">Select Your Second Minor</option>
-            </select>
-            <input type="hidden" id="selectedMinor2-sem" name="selectedMinor2" value="">
-            <div id="minor2Holokai-sem" class="holokai-info"></div>
-          </div>
-
-          <!-- English Level -->
-          <div class="input-group">
-            <label for="english-level-sem">English Level:</label>
-            <select id="english-level-sem"></select>
-          </div>
-
-          <!-- Starting semester -->
-          <div class="input-group">
-            <label for="start-semester-sem">Starting Semester:</label>
-            <select id="start-semester-sem">
-              <option value="Winter 2025">Winter 2025</option>
-              <option value="Spring 2025">Spring 2025</option>
-              <option value="Fall 2025">Fall 2025</option>
-              <option value="Winter 2026">Winter 2026</option>
-              <option value="Spring 2026">Spring 2026</option>
-            </select>
-          </div>
-
-          <!-- New dropdown for number of semesters -->
-          <div class="input-group">
-            <label for="total-semesters">Target Number of Semesters:</label>
-            <select id="total-semesters">
-              <option value="8">8 Semesters </option>
-              <option value="9">9 Semesters </option>
-              <option value="10" selected>10 Semesters </option>
-              <option value="11">11 Semesters </option>
-              <option value="12">12 Semesters</option>
-            </select>
-          </div>
-
-          <!-- Limit first year credits checkbox -->
-          <div class="input-group checkbox-group">
-            <label for="limit-first-year-sem">
-              <input type="checkbox" id="limit-first-year-sem"> Limit First Year Credits
-            </label>
-          </div>
-
-          <!-- New dropdown for max major classes per semester -->
-          <div class="input-group">
-            <label for="major-class-limit-sem">Max Major Classes Per Sem:</label>
-            <select id="major-class-limit-sem">
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4" selected>4</option>
-            </select>
-          </div>
-
-          <!-- Legend -->
-          <div class="legend">
-            <p><span class="legend-color type-major"></span> Major Classes</p>
-            <p><span class="legend-color type-minor"></span> Minor Classes</p>
-            <p><span class="legend-color type-eil"></span> EIL/Holokai Classes</p>
-            <p><span class="legend-color type-religion"></span> Religion Classes</p>
-          </div>
-
-          <!-- Generate Schedule button -->
-          <button id="calculate-schedule-sem">Generate Schedule</button>
-        </header>
-
-        <!-- Schedule Container (Initially Hidden) -->
-        <div id="schedule-container" class="hidden">
-          <!-- Summary Information -->
-          <div id="summary" class="summary-box">
-            <div class="summary-item animated-box" id="total-credits-box">
-              <p>Total Credits Taken</p>
-              <h2 id="total-credits">0</h2>
+          <!-- Minor 1 -->
+          <div class="field">
+            <label for="minor1-input">Minor 1</label>
+            <div class="sd" id="minor1-dd">
+              <input id="minor1-input" class="sd-input" type="text" placeholder="Search minors..." autocomplete="off" />
+              <div class="sd-list" id="minor1-list"></div>
+              <input type="hidden" id="minor1-id" />
             </div>
-            <div class="summary-item animated-box" id="graduation-date-box">
-              <p>Graduation Date</p>
-              <h2 id="graduation-date">TBD</h2>
-            </div>
-            <div class="summary-item animated-box" id="electives-needed-box">
-              <p>Elective Credits Needed</p>
-              <h2 id="electives-needed">0</h2>
-            </div>
+            <!-- square until filled -->
+            <div class="preview square" id="minor1-preview">No course selected</div>
           </div>
 
-          <!-- Schedule Grid -->
-          <div id="schedule">
-            <!-- Semester boxes populated by JavaScript -->
-          </div>
-
-          <button id="show-swiper-btn" class="hidden">Show Electives</button>
-          <div class="swiper-container hidden">
-            <div class="swiper-wrapper">
-              <div class="swiper-slide choose-elective">
-                <h1>Major Here</h1>
-                <button class="next-btn">Next &raquo;</button>
-                <p>CHEM 101: General Chemistry I & Lab</p>
-                <p>4.0 Credits</p>
-              </div>
-              <div class="swiper-slide choose-elective">
-                <button class="prev-btn">&laquo; Previous</button>
-                <h1>Major Here</h1>
-                <button class="next-btn">Next &raquo;</button>
-                <p>CHEM 101: General Chemistry I & Lab</p>
-                <p>4.0 Credits</p>
-              </div>
-              <div class="swiper-slide choose-elective">
-                <button class="prev-btn">&laquo; Previous</button>
-                <h1>Major Here</h1>
-                <p>Physics</p>
-                <p>4.0 Credits</p>
-                <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim
-                  eius obcaecati fugit sapiente rerum aperiam, quae ad, cum
-                  neque excepturi omnis sunt dicta quis, modi recusandae
-                  doloremque tenetur quisquam at.
-                </p>
-                <p>See less...</p>
-              </div>
+          <!-- Minor 2 -->
+          <div class="field">
+            <label for="minor2-input">Minor 2</label>
+            <div class="sd" id="minor2-dd">
+              <input id="minor2-input" class="sd-input" type="text" placeholder="Search minors..." autocomplete="off" />
+              <div class="sd-list" id="minor2-list"></div>
+              <input type="hidden" id="minor2-id" />
             </div>
+            <!-- square until filled -->
+            <div class="preview square" id="minor2-preview">No course selected</div>
           </div>
         </div>
+
+        <div class="legend">
+          <span class="item"><span class="dot red"></span> Arts & Humanities</span>
+          <span class="item"><span class="dot silver"></span> Professional Studies</span>
+          <span class="item"><span class="dot gold"></span> Math & Sciences</span>
+        </div>
+      </section>
+
+      <!-- Next button outside the box (Holokai step) -->
+      <div class="actions actions-outside">
+        <button id="next-btn" class="btn next" disabled>Next</button>
       </div>
-      <!-- End of the container -->
-    </div>
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Constraints + schedule UI (hidden until Next) -->
+      <section id="constraints-ui" class="constraints-layout" style="display:none">
+        <!-- Left: Constraints Sidebar -->
+        <aside class="constraints-sidebar">
+          <!-- Box 1: Your 3 Courses -->
+          <div class="sidebar-box card courses-box small">
+            <h3 class="card-title">Your Holokai</h3>
+            <div class="field">
+              <label for="c-major-input">Major</label>
+              <div class="sd" id="c-major-dd">
+                <input id="c-major-input" class="sd-input" type="text" placeholder="Search majors..." autocomplete="off" />
+                <div class="sd-list" id="c-major-list"></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="c-minor1-input">Minor 1</label>
+              <div class="sd" id="c-minor1-dd">
+                <input id="c-minor1-input" class="sd-input" type="text" placeholder="Search minors..." autocomplete="off" />
+                <div class="sd-list" id="c-minor1-list"></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="c-minor2-input">Minor 2</label>
+              <div class="sd" id="c-minor2-dd">
+                <input id="c-minor2-input" class="sd-input" type="text" placeholder="Search minors..." autocomplete="off" />
+                <div class="sd-list" id="c-minor2-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Box 2: Constraints -->
+          <div class="sidebar-box card constraints-box small">
+            <h3 class="card-title">Constraints</h3>
+            <div class="field">
+              <label for="eil-level">EIL Level</label>
+              <select id="eil-level" class="select-control">
+                <option value="none">None</option>
+                <option value="1">Level 1</option>
+                <option value="2">Level 2</option>
+                <option value="3">Level 3</option>
+                <option value="4">Level 4</option>
+                <option value="5">Level 5</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="start-sem">Starting Semester</label>
+              <select id="start-sem" class="select-control">
+                <option>Fall 2023</option>
+                <option>Winter 2024</option>
+                <option>Spring 2024</option>
+                <option>Fall 2024</option>
+              </select>
+            </div>
+
+            <div class="fields-row">
+              <div class="field">
+                <label for="max-fw">Max F/W credits</label>
+                <select id="max-fw" class="select-control">
+                  <option>12</option>
+                  <option>15</option>
+                  <option selected>18</option>
+                  <option>21</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="max-spring">Max S credits</label>
+                <select id="max-spring" class="select-control">
+                  <option>12</option>
+                  <option selected>15</option>
+                  <option>18</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="max-major">Max Major Classes Per Sem</label>
+              <select id="max-major" class="select-control">
+                <option>1</option>
+                <option selected>2</option>
+                <option>3</option>
+                <option>4</option>
+              </select>
+            </div>
+
+            <div class="field field-inline">
+              <label for="limit-year1">Limit First Year Credits</label>
+              <input id="limit-year1" type="checkbox" checked />
+            </div>
+
+            <div class="fields-row">
+              <div class="field">
+                <label for="max-fw-y1">1st Yr Max F/W credits</label>
+                <select id="max-fw-y1" class="select-control">
+                  <option>12</option>
+                  <option selected>15</option>
+                  <option>18</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="max-spring-y1">1st Yr Max S credits</label>
+                <select id="max-spring-y1" class="select-control">
+                  <option>12</option>
+                  <option selected>15</option>
+                  <option>18</option>
+                </select>
+              </div>
+            </div>
+            <div class="box-actions">
+              <button id="export-btn" class="btn export" type="button">Export</button>
+              <button id="next-btn-constraints" class="btn next" type="button">Generate</button>
+            </div>
+          </div>
+
+          <!-- Box 3: Ask AI -->
+          <div class="sidebar-box card ai-box small">
+            <h3 class="card-title">Ask AI</h3>
+            <div class="constraints-chat">
+              <textarea id="ai-prompt" rows="3" placeholder="Ask AI to rearrange your schedule..."></textarea>
+              <button id="ai-submit" class="btn next" type="button">Change with AI</button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right: Schedule canvas placeholder (to be implemented) -->
+        <div class="constraints-canvas">
+          <!-- Placeholder content for now -->
+        </div>
+      </section>
+    </main>
+
+  <script src="/js/partials.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/shoelace.js"></script>
     <script src="/js/script.js"></script>
-    <script src="/js/footer.js"></script> </body>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        if (typeof mountHeader === 'function') {
+          mountHeader('header-container');
+        }
+      });
+    </script>
   </body>
 </html>
