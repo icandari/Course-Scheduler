@@ -65,10 +65,142 @@
         </div>
       </section>
 
-      <!-- Next button outside the box -->
+      <!-- Next button outside the box (Holokai step) -->
       <div class="actions actions-outside">
         <button id="next-btn" class="btn next" disabled>Next</button>
       </div>
+
+  <!-- Constraints + schedule UI (hidden until Next) -->
+      <section id="constraints-ui" class="constraints-layout" style="display:none">
+        <!-- Left: Constraints Sidebar -->
+        <aside class="constraints-sidebar">
+          <!-- Box 1: Your 3 Courses -->
+          <div class="sidebar-box card courses-box small">
+            <h3 class="card-title">Your Holokai</h3>
+            <div class="field">
+              <label for="c-major-input">Major</label>
+              <div class="sd" id="c-major-dd">
+                <input id="c-major-input" class="sd-input" type="text" placeholder="Search majors..." autocomplete="off" />
+                <div class="sd-list" id="c-major-list"></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="c-minor1-input">Minor 1</label>
+              <div class="sd" id="c-minor1-dd">
+                <input id="c-minor1-input" class="sd-input" type="text" placeholder="Search minors..." autocomplete="off" />
+                <div class="sd-list" id="c-minor1-list"></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="c-minor2-input">Minor 2</label>
+              <div class="sd" id="c-minor2-dd">
+                <input id="c-minor2-input" class="sd-input" type="text" placeholder="Search minors..." autocomplete="off" />
+                <div class="sd-list" id="c-minor2-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Box 2: Constraints -->
+          <div class="sidebar-box card constraints-box small">
+            <h3 class="card-title">Constraints</h3>
+            <div class="field">
+              <label for="eil-level">EIL Level</label>
+              <select id="eil-level" class="select-control">
+                <option value="none">None</option>
+                <option value="1">Level 1</option>
+                <option value="2">Level 2</option>
+                <option value="3">Level 3</option>
+                <option value="4">Level 4</option>
+                <option value="5">Level 5</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="start-sem">Starting Semester</label>
+              <select id="start-sem" class="select-control">
+                <option>Fall 2023</option>
+                <option>Winter 2024</option>
+                <option>Spring 2024</option>
+                <option>Fall 2024</option>
+              </select>
+            </div>
+
+            <div class="fields-row">
+              <div class="field">
+                <label for="max-fw">Max F/W credits</label>
+                <select id="max-fw" class="select-control">
+                  <option>12</option>
+                  <option>15</option>
+                  <option selected>18</option>
+                  <option>21</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="max-spring">Max S credits</label>
+                <select id="max-spring" class="select-control">
+                  <option>12</option>
+                  <option selected>15</option>
+                  <option>18</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="max-major">Max Major Classes Per Sem</label>
+              <select id="max-major" class="select-control">
+                <option>1</option>
+                <option selected>2</option>
+                <option>3</option>
+                <option>4</option>
+              </select>
+            </div>
+
+            <div class="field field-inline">
+              <label for="limit-year1">Limit First Year Credits</label>
+              <input id="limit-year1" type="checkbox" checked />
+            </div>
+
+            <div class="fields-row">
+              <div class="field">
+                <label for="max-fw-y1">1st Yr Max F/W credits</label>
+                <select id="max-fw-y1" class="select-control">
+                  <option>12</option>
+                  <option selected>15</option>
+                  <option>18</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="max-spring-y1">1st Yr Max S credits</label>
+                <select id="max-spring-y1" class="select-control">
+                  <option>12</option>
+                  <option selected>15</option>
+                  <option>18</option>
+                </select>
+              </div>
+            </div>
+            <div class="box-actions">
+              <button id="export-btn" class="btn export" type="button">Export</button>
+              <button id="next-btn-constraints" class="btn next" type="button">Generate</button>
+            </div>
+          </div>
+
+          <!-- Box 3: Ask AI -->
+          <div class="sidebar-box card ai-box small">
+            <h3 class="card-title">Ask AI</h3>
+            <div class="constraints-chat">
+              <textarea id="ai-prompt" rows="3" placeholder="Ask AI to rearrange your schedule..."></textarea>
+              <button id="ai-submit" class="btn next" type="button">Change with AI</button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right: Schedule canvas placeholder (to be implemented) -->
+        <div class="constraints-canvas">
+          <!-- Placeholder content for now -->
+        </div>
+      </section>
     </main>
 
   <script src="/js/partials.js"></script>
