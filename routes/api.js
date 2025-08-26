@@ -595,7 +595,8 @@ router.put('/classes/:class_id', async (req, res) => {
             times_offered = null,
             is_senior_class = false,
             restrictions = null,
-            description = null
+            description = null,
+            link = null
         } = req.body;
 
         if (!class_number || !class_name) {
@@ -635,13 +636,11 @@ router.put('/classes/:class_id', async (req, res) => {
                     is_senior_class = $9,
                     restrictions = $10,
                     description = $11,
-                    restrictions = $12,
-                    teachers = $13,
-                    link = $14,
+                    link = $12,
                     updated_at = NOW()
-                WHERE id = $12
+                WHERE id = $13
                 RETURNING id, class_number, class_name, semesters_offered,
-                    prerequisites, corequisites, credits, days_offered, times_offered, is_senior_class, restrictions, description
+                    prerequisites, corequisites, credits, days_offered, times_offered, is_senior_class, restrictions, description, link
             `;
 
             const { rows: [updatedClass] } = await pool.query(updateQuery, [
@@ -656,8 +655,6 @@ router.put('/classes/:class_id', async (req, res) => {
                 is_senior_class,
                 restrictions,
                 description,
-                restrictions,
-                teachers,
                 link,
                 classIdNum
             ]);

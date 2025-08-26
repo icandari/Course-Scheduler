@@ -86,9 +86,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     modal.querySelector('.confirm-delete').addEventListener('click', async () => {
         try {
-            const deleteEndpoint = courseId
-                ? `/api/courses/${encodeURIComponent(courseId)}/classes/${encodeURIComponent(classId)}`
-                : `/api/classes/${encodeURIComponent(classId)}`;
+            // Always delete the class entity via the supported endpoint
+            // If you need to only remove the class from a specific course section,
+            // call DELETE /api/courses/:course_id/sections/:section_id/classes/:class_id instead.
+            const deleteEndpoint = `/api/classes/${encodeURIComponent(classId)}`;
 
             const response = await fetch(deleteEndpoint, {
                 method: 'DELETE'
@@ -104,10 +105,13 @@ window.addEventListener('DOMContentLoaded', async () => {
             
             // Redirect after short delay
             setTimeout(() => {
-                window.location.href = courseId
-                    ? `course_details.html?course_id=${encodeURIComponent(courseId)}`
-                    : 'search.html';
-            }, 1500);
+                // Prefer going back to the course details if we came from a course context
+                if (courseId) {
+                    window.location.href = `course_details.html?course_id=${encodeURIComponent(courseId)}`;
+                } else {
+                    window.location.href = 'search.html';
+                }
+            }, 1200);
 
         } catch (error) {
             console.error('Error deleting class:', error);
@@ -244,9 +248,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         };
 
         try {
-            const apiEndpoint = courseId
-                ? `/api/courses/${encodeURIComponent(courseId)}/classes/${encodeURIComponent(classId)}`
-                : `/api/classes/${encodeURIComponent(classId)}`;
+            // Use the supported endpoint for updating a class entity
+            const apiEndpoint = `/api/classes/${encodeURIComponent(classId)}`;
 
             const updateResponse = await fetch(apiEndpoint, {
                 method: 'PUT',
