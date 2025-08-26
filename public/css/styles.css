@@ -64,8 +64,6 @@ body{
   -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 /* Header: always a fixed top bar */
 .site-header{
   position:fixed; top:0; left:0; right:0;
@@ -75,22 +73,6 @@ body{
   padding:0 12px; z-index:60; box-shadow:0 3px 7px rgba(0,0,0,.10);
 }
 .logo{ height:70px; width:auto; display:block; }
-=======
-=======
->>>>>>> 9897865 (new ui)
-/* Header: vertical on desktop, horizontal at mobile */
-.site-header{
-  position:fixed; inset:0 auto 0 0; /* top:0; bottom:0; left:0 */
-  width:var(--sidebar-w);           /* vertical sidebar width */
-  background:#fff; border-right:1px solid #eee;
-  display:flex; align-items:flex-start; justify-content:center;
-  padding:16px 0; z-index:60; box-shadow:0 3px 7px rgba(0,0,0,.10);
-}
-.logo{ height:100px; width:auto; display:block; }
-<<<<<<< HEAD
->>>>>>> 9897865 (new ui)
-=======
->>>>>>> 9897865 (new ui)
 
 /* Burger button (hidden on desktop) */
 .burger-btn{ display:none; align-self:center; width:36px; height:28px; border:none; background:transparent; cursor:pointer; }
@@ -112,16 +94,8 @@ body{
 .app{
   max-width: calc(var(--app-max-w-base) * var(--ui-scale));
   margin:40px auto 80px;
-<<<<<<< HEAD
-<<<<<<< HEAD
   /* top padding to clear header, remove sidebar offset */
   padding:72px 16px 60px 16px;
-=======
-  padding:0 16px 0 calc(var(--sidebar-w) + 16px); /* leave room for sidebar */
->>>>>>> 9897865 (new ui)
-=======
-  padding:0 16px 0 calc(var(--sidebar-w) + 16px); /* leave room for sidebar */
->>>>>>> 9897865 (new ui)
 }
 .app-title{
   text-align:center;
@@ -155,8 +129,6 @@ h1,h2,h3,h4,h5,h6,
   padding:28px 24px;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 /* Constraints layout */
 .constraints-layout{
   display:grid;
@@ -227,6 +199,22 @@ h1,h2,h3,h4,h5,h6,
 }
 .sem-header{ padding:10px 12px; font-weight:600; color:#111827; border-bottom:1px solid var(--border); }
 .courses{ flex:1; padding:10px; }
+.semester-card .classes-list{ list-style:none; margin:0; padding:10px; display:flex; flex-direction:column; gap:10px; flex:1; }
+.semester-card .class-item{ margin:0; padding:0; }
+.semester-card .class-card{
+  background:#fff; border:1px solid var(--border); border-radius:10px; padding:8px 10px;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+  display:grid; grid-template-rows:auto auto auto; row-gap:4px;
+}
+.semester-card .cc-row1{ display:flex; align-items:center; gap:8px; }
+.semester-card .class-number{ font-weight:700; color:#111827; }
+.semester-card .cc-row2.class-name{ color:#374151; font-size:14px; }
+.semester-card .cc-row3.class-credits{ color:#6b7280; font-size:12px; }
+.semester-card .info-btn{
+  margin-left:auto; border:1px solid var(--border); background:#f9fafb; color:#374151;
+  width:20px; height:20px; border-radius:6px; font-size:12px; line-height:1; display:inline-grid; place-items:center; cursor:pointer;
+}
+.semester-card .info-btn:hover{ background:#f3f4f6; }
 .sem-footer{ padding:8px 12px; color:#6b7280; font-size:13px; border-top:1px solid var(--border); }
 
 @media (max-width: 900px){
@@ -252,10 +240,6 @@ h1,h2,h3,h4,h5,h6,
 /* Disabled look for selects when limited is off */
 .select-control:disabled{ background:#f3f4f6; color:#9ca3af; cursor:not-allowed; }
 
-=======
->>>>>>> 9897865 (new ui)
-=======
->>>>>>> 9897865 (new ui)
 /* Holokai card: more inner spacing */
 #step-holokai.card{
   position: relative;
@@ -353,15 +337,7 @@ h1,h2,h3,h4,h5,h6,
 .sd{ position:relative; width:var(--input-w); margin-inline:auto; }
 .sd-input{
   width:100%;
-<<<<<<< HEAD
-<<<<<<< HEAD
   height: calc(var(--control-h) * .85); /* make shorter */
-=======
-  height:var(--control-h);
->>>>>>> 9897865 (new ui)
-=======
-  height:var(--control-h);
->>>>>>> 9897865 (new ui)
   /* Comfortable padding */
   padding: calc(8px * var(--control-scale)) calc(18px * var(--ui-scale));
   border:1px solid var(--border); border-radius:10px;
@@ -491,27 +467,9 @@ h1,h2,h3,h4,h5,h6,
   :root{ --input-w: 100%; }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 /* At tablet and below, slightly reduce side padding */
 @media (max-width: 900px){
   .app{ padding:72px 12px 60px 12px; }
-=======
-=======
->>>>>>> 9897865 (new ui)
-/* At tablet and below, convert header to top horizontal bar */
-@media (max-width: 900px){
-  .site-header{
-    inset:auto 0 auto 0; top:0; left:0; right:0; bottom:auto;
-    width:100%; height:80px; border-right:none; border-bottom:1px solid #eee;
-    flex-direction:row; align-items:center; justify-content:flex-start; padding:0 12px;
-  }
-  .logo{ height:70px; }
-  .app{ padding:72px 12px 60px 12px; } /* top padding to clear header, remove sidebar offset */
-<<<<<<< HEAD
->>>>>>> 9897865 (new ui)
-=======
->>>>>>> 9897865 (new ui)
 }
 
 /* Mobile behavior */
