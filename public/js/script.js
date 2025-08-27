@@ -3,7 +3,13 @@
 const state = {
   datasets: { majors: [], minors: [] },
   selected: { major: null, minor1: null, minor2: null }, // { id, name, holokai }
-  scheduleGenerated: false
+  scheduleGenerated: false,
+  // Elective selection wizard
+  courseDataCache: null,            // detailed course data fetched once on entering wizard
+  electiveSections: [],             // flattened list of elective sections to complete
+  electiveIndex: 0,                 // current wizard index
+  chosenElectives: {},              // sectionId -> Set(classId)
+  classIndex: null                  // Map of classId -> class object (for prereq/coreq credit lookups)
 };
 
 // --- Persistence helpers ---
@@ -109,6 +115,10 @@ function mountDropdown({ inputEl, listEl, options, type }) {
         updateNextButton();
         // Re-render lists for other dropdowns to reflect incompatibilities
         refreshAllLists();
+        // If we're on the constraints screen, reset and re-run electives wizard immediately
+        if (isConstraintsVisible()) {
+          resetAndStartElectivesFlow();
+        }
       });
 
       listEl.appendChild(item);
@@ -134,6 +144,32 @@ function mountDropdown({ inputEl, listEl, options, type }) {
   document.addEventListener('click', close);
 
   return { refresh: () => open && renderList(inputEl.value), close };
+}
+
+// Helper: is constraints UI currently visible?
+function isConstraintsVisible() {
+  const el = document.getElementById('constraints-ui');
+  if (!el) return false;
+  // If not explicitly hidden
+  return el.style.display !== 'none' && !!el.offsetParent;
+}
+
+// Helper: reset wizard state and start fresh (used when course selection changes)
+function resetAndStartElectivesFlow() {
+  // Invalidate any cached data and choices
+  state.courseDataCache = null;
+  state.electiveSections = [];
+  state.electiveIndex = 0;
+  state.chosenElectives = {};
+  // Update sidebar Generate button to disabled until new wizard completes
+  const genBtn = document.getElementById('next-btn-constraints');
+  if (genBtn) {
+    genBtn.textContent = 'Generate';
+    genBtn.disabled = true;
+    genBtn.onclick = () => {};
+  }
+  // Kick off
+  startElectivesFlow();
 }
 
 // Update preview card under each selector
@@ -188,6 +224,10 @@ function updatePreview(which) {
       updatePreview(which);
       updateNextButton();
       refreshAllLists();
+      // If constraints are visible, reset the electives picker flow
+      if (isConstraintsVisible()) {
+        resetAndStartElectivesFlow();
+      }
     });
   }
 
@@ -248,7 +288,7 @@ function showConstraintsUI() {
       type: 'minor1'
     });
   }
-  if (!ddInstances.cMinor2 && document.getElementById('c-minor2-input')) {
+  if (!ddInstances.cMinor2 && document.getElementById('c-minor2-input')) {   
     ddInstances.cMinor2 = mountDropdown({
       inputEl: document.getElementById('c-minor2-input'),
       listEl: document.getElementById('c-minor2-list'),
@@ -260,12 +300,9 @@ function showConstraintsUI() {
   // Ensure the re-selector inputs reflect current selection
   syncInputsFromState();
 
-  // Show placeholder until user clicks Generate
+  // Immediately start the electives picker since courses are chosen
   state.scheduleGenerated = false;
-  const canvasInit = document.querySelector('.constraints-canvas');
-  if (canvasInit) {
-    canvasInit.innerHTML = '<div class="canvas-placeholder">Click Generate to see your college plan</div>';
-  }
+  resetAndStartElectivesFlow();
 
   // Re-render when starting semester changes
   const startSel = document.getElementById('start-sem');
@@ -451,13 +488,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-  // If constraints Next exists (after constraints UI is shown), wire it too
-    const insideNext = document.getElementById('next-btn-constraints');
-    if (insideNext) {
-      insideNext.addEventListener('click', () => {
-        generateScheduleFromConstraints();
-      });
-    }
+  // Do not wire a static handler for Generate here; startElectivesFlow manages it
 
     // Hook up export button when constraints UI present
     const exportBtn = document.getElementById('export-btn');
@@ -603,8 +634,9 @@ async function buildConstraintsPayload() {
   const eilSel = document.getElementById('eil-level');
   const eilLevel = eilSel ? eilSel.value : 'none';
 
-  // Fetch detailed course/class data
-  const courseData = await fetchRequiredCourseData(majorId, minor1Id, minor2Id, eilLevel);
+  // Fetch detailed course/class data (reuse cache if wizard already fetched it)
+  const courseData = state.courseDataCache || await fetchRequiredCourseData(majorId, minor1Id, minor2Id, eilLevel);
+  state.courseDataCache = courseData;
 
   // Constraints
   const startSemester = document.getElementById('start-sem')?.value || '';
@@ -628,6 +660,13 @@ async function buildConstraintsPayload() {
       fallWinterCredits: firstYearFW,
       springCredits: firstYearSP
     };
+  }
+
+  // Include user-chosen elective class IDs (wizard) if any
+  const selectedElectiveIds = Object.values(state.chosenElectives)
+    .reduce((acc, set) => acc.concat(Array.from(set)), []);
+  if (selectedElectiveIds.length) {
+    preferences.selectedElectives = selectedElectiveIds;
   }
 
   return { courseData, preferences };
@@ -760,4 +799,302 @@ async function generateScheduleFromConstraints() {
   } finally {
     hideLoadingIndicator();
   }
+}
+
+// ---------------------- Electives Wizard ----------------------
+
+function findElectiveSections(courseData) {
+  const relevantTypes = new Set(['major', 'minor', 'religion']);
+  const sections = [];
+  (courseData || []).forEach(course => {
+    const type = (course.course_type || '').toLowerCase();
+    if (!relevantTypes.has(type)) return;
+    (course.sections || []).forEach(sec => {
+      const isElectiveSection = (sec.is_required === false) && (sec.credits_needed_to_take || 0) > 0 && Array.isArray(sec.classes) && sec.classes.length > 0;
+      if (isElectiveSection) {
+        sections.push({
+          parentCourseId: course.id,
+          parentCourseName: course.course_name,
+          parentCourseType: course.course_type,
+          id: sec.id,
+          section_name: sec.section_name,
+          credits_needed_to_take: sec.credits_needed_to_take,
+          classes: sec.classes
+        });
+      }
+    });
+  });
+  return sections;
+}
+
+function uniformClassCredits(classes) {
+  const credits = (classes || []).map(c => Number(c.credits) || 0).filter(Boolean);
+  if (!credits.length) return null;
+  const first = credits[0];
+  return credits.every(c => c === first) ? first : null;
+}
+
+function ensureSet(map, key) {
+  if (!map[key]) map[key] = new Set();
+  return map[key];
+}
+
+function renderElectivesWizard() {
+  const canvas = document.querySelector('.constraints-canvas');
+  if (!canvas) return;
+  // While wizard is visible, gray out only the Constraints box (keep Holokai and AI active)
+  document.querySelector('.constraints-box')?.classList.add('disabled');
+
+  // If no elective sections, skip directly to schedule generation UI
+  if (!state.electiveSections.length) {
+    canvas.innerHTML = '<div class="canvas-placeholder">No electives to choose. Click Generate to build your plan.</div>';
+    // Also enable the sidebar Generate button if present
+    const genBtn = document.getElementById('next-btn-constraints');
+    if (genBtn) {
+      genBtn.disabled = false;
+      genBtn.textContent = 'Generate';
+      genBtn.onclick = () => generateScheduleFromConstraints();
+    }
+  // Re-enable Constraints box
+  document.querySelector('.constraints-box')?.classList.remove('disabled');
+    return;
+  }
+
+  const idx = Math.max(0, Math.min(state.electiveIndex, state.electiveSections.length - 1));
+  const sec = state.electiveSections[idx];
+  const classes = sec.classes || [];
+  const needCredits = Number(sec.credits_needed_to_take) || 0;
+  const uniform = uniformClassCredits(classes);
+  const chooseCount = uniform && needCredits % uniform === 0 ? Math.round(needCredits / uniform) : null;
+
+  // Build class cards
+  const chosenSet = ensureSet(state.chosenElectives, sec.id);
+  const itemsHtml = classes.map(cls => {
+    const id = cls.id;
+    const selected = chosenSet.has(id);
+    const num = cls.class_number || '';
+    const name = cls.class_name || '';
+    const credits = Number(cls.credits) || 0;
+    return `
+      <li class="class-item">
+        <div class="class-card selectable ${selected ? 'selected' : ''}" data-class-id="${id}">
+          <div class="cc-row1">
+            <button class="card-check" aria-pressed="${selected}" aria-label="Select elective"></button>
+            <span class="class-number">${num}</span>
+            <button class="info-btn" aria-label="Details">i</button>
+          </div>
+          <div class="cc-row2 class-name">${name}</div>
+          <div class="cc-row3 class-credits">${credits}cr</div>
+        </div>
+      </li>
+    `;
+  }).join('');
+
+  const headerTitle = `Choose Electives for ${sec.parentCourseName}`;
+  const headerSubtitle = needCredits ? `Choose ${needCredits} Credits` : 'Choose electives';
+  const isLast = idx === (state.electiveSections.length - 1);
+
+  const html = `
+    <div class="electives-panel">
+      <div class="elective-toolbar">
+        <div class="et-titles">
+          <div class="et-title">${headerTitle}</div>
+          <div class="et-sub">${sec.section_name} • ${headerSubtitle}</div>
+        </div>
+        <div class="et-progress">${idx + 1} / ${state.electiveSections.length}</div>
+      </div>
+      <div class="elective-classes">
+        <ul class="classes-list">${itemsHtml}</ul>
+      </div>
+    </div>
+    <div class="wizard-actions below">
+      <button class="btn back" id="wiz-back" ${idx === 0 ? 'disabled' : ''}>Back</button>
+      <button class="btn next" id="wiz-next" disabled>Next</button>
+    </div>
+  `;
+
+  canvas.innerHTML = html;
+
+  // Selection logic
+  const updateNextEnabled = () => {
+    const selectedIds = Array.from(ensureSet(state.chosenElectives, sec.id));
+    const nextEl = document.getElementById('wiz-next');
+    if (!needCredits) {
+      if (nextEl) nextEl.disabled = selectedIds.length === 0;
+      return;
+    }
+    // Calculate selected credits including corequisites
+    const { credits } = computeSectionSelectionCredits(sec, selectedIds);
+    if (chooseCount) {
+      const ok = selectedIds.length >= chooseCount;
+      if (nextEl) nextEl.disabled = !ok;
+    } else {
+      // Allow up to +1 credit over the needCredits
+      const allowed = needCredits + 1;
+      const ok = credits >= needCredits && credits <= allowed;
+      if (nextEl) nextEl.disabled = !ok;
+    }
+  };
+
+  canvas.querySelectorAll('.class-card.selectable').forEach(card => {
+    const cid = Number(card.getAttribute('data-class-id'));
+    const toggle = () => {
+      const set = ensureSet(state.chosenElectives, sec.id);
+      const nextSelected = new Set(set);
+      if (nextSelected.has(cid)) {
+        nextSelected.delete(cid);
+      } else {
+        nextSelected.add(cid);
+      }
+      // Enforce max allowed credits (needCredits + 1), considering corequisites
+      if (needCredits) {
+        const { credits } = computeSectionSelectionCredits(sec, Array.from(nextSelected));
+        const allowed = needCredits + 1;
+        if (credits > allowed) {
+          // Do not apply the over-selection
+          // Optional: flash an inline warning later; for now silently block
+          return;
+        }
+      }
+      // Commit the change
+      if (set.has(cid)) set.delete(cid); else set.add(cid);
+      card.classList.toggle('selected');
+      const btn = card.querySelector('.card-check');
+      if (btn) btn.setAttribute('aria-pressed', String(set.has(cid)));
+      updateNextEnabled();
+    };
+    card.addEventListener('click', (e) => {
+      if (e.target && (e.target.classList.contains('info-btn'))) return; // ignore info click
+      toggle();
+    });
+    const chk = card.querySelector('.card-check');
+    if (chk) chk.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+  });
+
+  updateNextEnabled();
+
+  // Nav buttons
+  const backBtn = document.getElementById('wiz-back');
+  const nextBtn = document.getElementById('wiz-next');
+  if (backBtn) backBtn.addEventListener('click', () => {
+    if (state.electiveIndex > 0) {
+      state.electiveIndex -= 1;
+      // Moving back means wizard not complete; ensure Generate is disabled again
+      const genBtn = document.getElementById('next-btn-constraints');
+      if (genBtn) genBtn.disabled = true;
+      renderElectivesWizard();
+    }
+  });
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    if (state.electiveIndex < state.electiveSections.length - 1) {
+      state.electiveIndex += 1;
+      renderElectivesWizard();
+    } else {
+  // Final step: clear the electives list, hide the toolbar, show message, enable sidebar, and enable Generate
+      const panel = document.querySelector('.electives-panel');
+      const classesWrap = panel ? panel.querySelector('.elective-classes') : null;
+      if (classesWrap) {
+        classesWrap.innerHTML = '<div class="electives-finish">Elective classes chosen. Next step: Choose constraints and generate schedule</div>';
+      }
+  const toolbar = panel ? panel.querySelector('.elective-toolbar') : null;
+  if (toolbar) toolbar.style.display = 'none';
+
+      // Disable the Next button
+      nextBtn.disabled = true;
+
+      // Enable Generate in the sidebar
+      const genBtn = document.getElementById('next-btn-constraints');
+      if (genBtn) {
+        genBtn.disabled = false;
+        genBtn.textContent = 'Generate';
+        genBtn.onclick = () => generateScheduleFromConstraints();
+      }
+
+  // Re-enable Constraints box
+  document.querySelector('.constraints-box')?.classList.remove('disabled');
+    }
+  });
+}
+
+async function startElectivesFlow() {
+  try {
+    // Build or reuse detailed course data (uses current EIL selection too)
+    const majorId = state.selected.major?.id || null;
+    const minor1Id = state.selected.minor1?.id || null;
+    const minor2Id = state.selected.minor2?.id || null;
+    if (!majorId || !minor1Id || !minor2Id) {
+      alert('Please select a Major and two Minors first.');
+      return;
+    }
+    const eilSel = document.getElementById('eil-level');
+    const eilLevel = eilSel ? eilSel.value : 'none';
+
+    // Show a light placeholder while loading sections
+    const canvas = document.querySelector('.constraints-canvas');
+    if (canvas) canvas.innerHTML = '<div class="canvas-placeholder">Loading electives…</div>';
+
+  state.courseDataCache = await fetchRequiredCourseData(majorId, minor1Id, minor2Id, eilLevel);
+  // Build a global class index for credit lookups including corequisites
+  state.classIndex = buildClassIndex(state.courseDataCache);
+    state.electiveSections = findElectiveSections(state.courseDataCache);
+    state.electiveIndex = 0;
+    state.chosenElectives = {}; // reset previous choices
+
+    // Change sidebar button to act as Generate but disabled until wizard completes
+    const genBtn = document.getElementById('next-btn-constraints');
+    if (genBtn) {
+      genBtn.textContent = 'Generate';
+      genBtn.disabled = true;
+      genBtn.onclick = () => {};
+    }
+
+    renderElectivesWizard();
+  } catch (e) {
+    console.error(e);
+    alert('Unable to load electives.');
+  }
+}
+
+// Build a global index of classes by id from all sections and additional classes
+function buildClassIndex(courseData) {
+  const idx = new Map();
+  (courseData || []).forEach(course => {
+    (course.sections || []).forEach(sec => {
+      (sec.classes || []).forEach(cls => {
+        if (cls && (cls.id || cls.id === 0)) idx.set(cls.id, cls);
+      });
+    });
+  });
+  return idx;
+}
+
+// Compute credits for a set of selected IDs within a section, including required corequisites
+function computeSectionSelectionCredits(section, selectedIds) {
+  const needCredits = Number(section.credits_needed_to_take) || 0;
+  const idx = state.classIndex instanceof Map ? state.classIndex : new Map();
+  const visited = new Set();
+  const queue = [];
+  // Seed with selected IDs
+  (selectedIds || []).forEach(id => { if (!visited.has(id)) { visited.add(id); queue.push(id); } });
+  // BFS over corequisites
+  while (queue.length) {
+    const id = queue.shift();
+    const cls = idx.get(id);
+    if (!cls) continue;
+    const coreqs = Array.isArray(cls.corequisites) ? cls.corequisites : [];
+    coreqs.forEach(c => {
+      const cid = typeof c === 'object' ? c.id : c;
+      if (cid != null && !visited.has(cid)) {
+        visited.add(cid);
+        queue.push(cid);
+      }
+    });
+  }
+  // Sum credits (avoid NaN)
+  let credits = 0;
+  visited.forEach(id => {
+    const c = idx.get(id);
+    if (c && c.credits != null) credits += Number(c.credits) || 0;
+  });
+  return { credits, needCredits };
 }

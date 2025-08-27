@@ -137,7 +137,9 @@ h1,h2,h3,h4,h5,h6,
   margin-top:24px;
 }
 @media (max-width: 900px){
-  .constraints-layout{ grid-template-columns: 1fr; }
+  .constraints-layout{ display:flex; flex-direction:column; gap:14px; }
+  /* Move the canvas above the sidebar on mobile */
+  .constraints-canvas{ order:-1; }
 }
 .constraints-sidebar{
   display:flex; flex-direction:column; gap:14px;
@@ -173,7 +175,7 @@ h1,h2,h3,h4,h5,h6,
   width:100%; resize:vertical; border:1px solid var(--border); border-radius:10px;
   padding:10px; font-family: var(--font-sans);
 }
-.constraints-canvas{ min-height: 400px; background: rgba(0,0,0,0.03); border:1px dashed #e5e7eb; border-radius:12px; }
+.constraints-canvas{ min-height: 400px; background: transparent; border:none; border-radius:0; }
 
 /* Stats box */
 .stats-box{
@@ -223,10 +225,7 @@ h1,h2,h3,h4,h5,h6,
 }
 
 /* Placeholder before generation */
-.canvas-placeholder{
-  background:#fff; border:1px dashed var(--border); border-radius:12px;
-  padding:22px; text-align:center; color:#6b7280; font-size:15px;
-}
+.canvas-placeholder{ padding:22px; text-align:center; color:#6b7280; font-size:15px; }
 
 /* Box action buttons within Constraints */
 .constraints-box .box-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
@@ -479,3 +478,45 @@ h1,h2,h3,h4,h5,h6,
   /* Show burger button in sidebar */
   .burger-btn{ display:block; }
 }
+
+/* ===== Electives Wizard (right panel) ===== */
+.electives-panel{ background:#fff; border:1px solid var(--border); border-radius:12px; box-shadow: var(--shadow); padding:16px; }
+/* Mobile: remove panel container chrome so classes sit naturally above sidebar */
+@media (max-width: 900px){
+  .electives-panel{ background:transparent; border:none; box-shadow:none; padding:0; }
+}
+.electives-panel.disabled{ opacity:.5; pointer-events:none; filter: grayscale(0.15); }
+.elective-toolbar{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.elective-toolbar .et-title{ font-weight:700; font-size:18px; }
+.elective-toolbar .et-sub{ color:#6b7280; font-size:14px; }
+.elective-toolbar .et-progress{ color:#111827; font-weight:700; font-size:14px; margin-left:8px; }
+.elective-classes .classes-list{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:12px; }
+@media (max-width: 900px){ .elective-classes .classes-list{ grid-template-columns: 1fr; } }
+.wizard-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:8px; }
+.wizard-actions.below{ margin-top:8px; }
+.wizard-actions .btn{ font-size: 0.75rem; padding: 6px 10px; }
+.wizard-actions .btn.next:disabled{ background:#cbd5e1; color:#fff; cursor:not-allowed; }
+.electives-finish{ margin-top:10px; color:#111827; }
+
+/* Selectable class-card variants */
+.class-card.selectable{ position:relative; cursor:pointer; }
+.class-card.selectable .cc-row1{ display:flex; align-items:center; gap:6px; }
+.class-card.selectable .card-check{
+  position:relative; top:0; left:0; width:18px; height:18px; border-radius:999px;
+  border:2px solid #d1d5db; background:#fff; display:inline-block; cursor:pointer; flex:0 0 auto;
+}
+.electives-panel .class-card{
+  background:#fff; border:1px solid var(--border); border-radius:10px; padding:10px 12px;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.class-card.selectable.selected{ outline:2px solid var(--blue-600); }
+.class-card.selectable.selected .card-check{ background:var(--blue-600); border-color:var(--blue-600); }
+/* Space between course number and info button */
+.class-card .class-number{ margin-right:4px; font-weight:700; }
+.class-card .info-btn{ margin-left:4px; }
+
+/* Hide colored dots inside elective picker cards to reduce clutter */
+.electives-panel .class-card .dot{ display:none; }
+
+/* Gray-out style for an individual sidebar box when disabled */
+.constraints-sidebar .sidebar-box.disabled{ opacity: .5; pointer-events: none; filter: grayscale(0.15); }
