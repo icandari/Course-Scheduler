@@ -754,6 +754,9 @@ function buildRequiredAndSelectedClasses(courseData, chosenElectives) {
 
   // 1) Seed with ALL required classes from selected courses
   (courseData || []).forEach(course => {
+  // Never treat synthetic/system buckets as required seeds
+  const courseType = (course?.course_type || '').toLowerCase();
+  if (courseType === 'system') return;
     const fromCourseLabel = resolveFromCourseLabel(course);
     (course.sections || []).forEach(sec => {
       const isElectiveSection = (sec?.is_required === false) && ((sec?.credits_needed_to_take || 0) > 0);
@@ -875,13 +878,16 @@ async function fetchRequiredCourseData(majorId, minor1Id, minor2Id, eilLevel) {
   const mainCourseClassIds = new Set();
 
   const fetchCourse = async (id) => {
-    const resp = await fetch(`/api/courses/${id}?fields=essential`);
+  const resp = await fetch(`/api/courses/${id}`);
     if (!resp.ok) throw new Error(`Failed to fetch course ${id}`);
     const data = await resp.json();
     data.sections?.forEach(sec => {
+      const isElectiveSection = (sec?.is_required === false) && ((sec?.credits_needed_to_take || 0) > 0);
       sec.classes?.forEach(cls => {
+        // Track all main course classes (for later de-dupe), but only harvest deps from required sections
         includedClassIds.add(cls.id);
         mainCourseClassIds.add(cls.id);
+        if (isElectiveSection) return; // don't pull deps for electives here; they'll come from the user's choices later
         if (Array.isArray(cls.prerequisites)) {
           cls.prerequisites.forEach(p => {
             const pid = typeof p === 'object' ? p.id : p;
@@ -956,7 +962,7 @@ async function fetchRequiredCourseData(majorId, minor1Id, minor2Id, eilLevel) {
       id: 'additional',
       course_name: 'Additional Prerequisites/Corequisites',
       course_type: 'system',
-      sections: [{ id: 'additional-section', section_name: 'Required External Classes', classes: additionalClasses }]
+  sections: [{ id: 'additional-section', section_name: 'Required External Classes', is_required: false, credits_needed_to_take: 0, classes: additionalClasses }]
     });
   }
 
@@ -1405,6 +1411,8 @@ async function startElectivesFlow() {
     if (canvas) canvas.innerHTML = '<div class="canvas-placeholder">Loading electives…</div>';
 
   state.courseDataCache = await fetchRequiredCourseData(majorId, minor1Id, minor2Id, eilLevel);
+  // Augment with missing corequisites for elective items so credits/closure work correctly
+  await augmentElectiveCoreqs(state.courseDataCache);
   // Build a global class index for credit lookups including corequisites
   state.classIndex = buildClassIndex(state.courseDataCache);
     state.electiveSections = findElectiveSections(state.courseDataCache);
@@ -1437,6 +1445,69 @@ function buildClassIndex(courseData) {
     });
   });
   return idx;
+}
+
+// Ensure elective classes have their corequisites available in the dataset/index for credit counting and dependency closure.
+// This does NOT display the coreq classes in the elective picker because they are added under a synthetic 'system' course.
+async function augmentElectiveCoreqs(courseData){
+  try {
+    const presentIds = new Set();
+    (courseData || []).forEach(c => (c.sections || []).forEach(s => (s.classes || []).forEach(cls => presentIds.add(cls.id))));
+
+    // Collect missing coreq IDs only from elective sections (is_required=false with credits_needed_to_take>0)
+    const needed = new Set();
+    (courseData || []).forEach(course => {
+      const type = (course.course_type || '').toLowerCase();
+      if (!['major','minor','religion'].includes(type)) return;
+      (course.sections || []).forEach(sec => {
+        const isElective = (sec?.is_required === false) && ((sec?.credits_needed_to_take || 0) > 0);
+        if (!isElective) return;
+        (sec.classes || []).forEach(cls => {
+          const coreqs = Array.isArray(cls.corequisites) ? cls.corequisites : [];
+          coreqs.forEach(c => {
+            const cid = typeof c === 'object' ? c.id : c;
+            if (cid != null && !presentIds.has(cid)) needed.add(Number(cid));
+          });
+        });
+      });
+    });
+
+    if (needed.size === 0) return;
+
+    // Fetch missing coreq class details
+    const extras = [];
+    for (const id of needed) {
+      try {
+        const resp = await fetch(`/api/classes/${id}?fields=essential`);
+        if (resp.ok) {
+          const obj = await resp.json();
+          if (obj && (obj.id || obj.id === 0)) {
+            extras.push(obj);
+            presentIds.add(obj.id);
+          }
+        }
+      } catch {}
+    }
+
+    if (!extras.length) return;
+
+    // Merge into an existing synthetic 'additional' course if present; else create one
+    let additional = (courseData || []).find(c => c && c.id === 'additional' && (c.course_type || '').toLowerCase() === 'system');
+  if (!additional) {
+      additional = {
+        id: 'additional',
+        course_name: 'Additional Prerequisites/Corequisites',
+        course_type: 'system',
+    sections: [{ id: 'additional-section', section_name: 'Required External Classes', is_required: false, credits_needed_to_take: 0, classes: [] }]
+      };
+      courseData.push(additional);
+    }
+    const sec = additional.sections && additional.sections[0] ? additional.sections[0] : null;
+    if (sec) {
+      const byId = new Set((sec.classes || []).map(c => c.id));
+      extras.forEach(c => { if (!byId.has(c.id)) { (sec.classes || (sec.classes = [])).push(c); byId.add(c.id); } });
+    }
+  } catch {}
 }
 
 // Compute credits for a set of selected IDs within a section, including required corequisites

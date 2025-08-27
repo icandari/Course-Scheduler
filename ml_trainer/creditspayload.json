@@ -787,9 +787,9 @@
             "from_course": "minor"
         },
         {
-            "id": 45,
-            "class_number": "PAIS 340",
-            "class_name": "Anti-Racism and Belonging: Pacific Dialogue",
+            "id": 44,
+            "class_number": "PAIS 330",
+            "class_name": "Sovereignty and Self Governance in Oceania",
             "semesters_offered": [
                 "Fall",
                 "Winter"
@@ -878,17 +878,17 @@
             "from_course": "major"
         },
         {
-            "id": 17,
-            "class_number": "CS 490R",
-            "class_name": "Advanced Topics in Computer Science",
+            "id": 724,
+            "class_number": "CS 404",
+            "class_name": "Advanced Web Applications",
             "semesters_offered": [
-                "Fall"
+                "Spring"
             ],
             "credits": 3,
-            "is_senior_class": true,
+            "is_senior_class": false,
             "restrictions": "",
             "prerequisites": [
-                12
+                14
             ],
             "corequisites": [],
             "days_offered": [],
