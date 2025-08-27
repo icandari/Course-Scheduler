@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from constraint_optimizer import ScheduleOptimizer
-from semester_based_optimizer import SemesterBasedOptimizer  # Add this import
 from run_credits_simple import create_schedule as simple_credits_create_schedule
+from run_semester_simple import create_schedule as simple_semester_create_schedule
 from data_processor import ScheduleDataProcessor
 import os
 from datetime import datetime
@@ -78,9 +77,8 @@ def generate_schedule():
 
         # Support both spellings: 'semester-based' (preferred) and 'semesters-based' (legacy)
         if approach in ("semester-based", "semesters-based"):
-            logger.info("Using SemesterBasedOptimizer")
-            optimizer = SemesterBasedOptimizer()
-            schedule_result = optimizer.create_schedule(processed_data)
+            logger.info("Using simple semester-based scheduler")
+            schedule_result = simple_semester_create_schedule(processed_data)
         else:
             # Use the simplified credits-based scheduler we built
             logger.info("Using simple credits-based scheduler")
@@ -183,30 +181,22 @@ def test_course_data():
 
 @app.route('/test-optimizer', methods=['POST'])
 def test_optimizer():
-    """Test endpoint for the optimizer functionality"""
+    """Minimal test endpoint to validate processing and approach selection"""
     try:
-        data = request.json
+        data = request.json or {}
         logger.info("=== Testing Optimizer ===")
-        
-        # Process the data
+
         processor = ScheduleDataProcessor()
         processed_data = processor.process_payload(data)
-        
-        # Determine approach and test appropriate optimizer
-        approach = processed_data["parameters"].get("approach", "credits-based")
-        
-        if approach == "semesters-based":
-            optimizer = SemesterBasedOptimizer()
-        else:
-            optimizer = ScheduleOptimizer()
-        
-        logger.info(f"Testing {approach} optimizer...")
-        
+        params = processed_data.get("parameters") or {}
+        approach = params.get("approach", "credits-based")
+        logger.info(f"Test endpoint received approach: {approach}")
+
         return jsonify({
             "status": "success",
             "approach": approach,
-            "processed_data": processed_data,
-            "course_count": len(processed_data.get('classes', {})),
+            "course_count": len(processed_data.get('classes', [])),
+            "parameters": params,
             "timestamp": str(datetime.now())
         })
     except Exception as e:
