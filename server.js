@@ -71,37 +71,46 @@ app.get('/api/classes/for-courses', async (req, res) => {
 // Update this proxy route in your server.js
 app.post('/api/generate-schedule', async (req, res) => {
     try {
-        // Get the correct ML service URL
-        const mlServiceUrl = process.env.ML_SERVICE_URL;
-        
-        console.log(`Attempting to connect to ML service at: ${mlServiceUrl}/generate-schedule`);
-        
-        const response = await axios.post(
-            `${mlServiceUrl}/generate-schedule`, // This should be the full URL
-            req.body,
-            {
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Origin': process.env.NODE_ENV === 'production' 
-                        ? 'https://course-scheduler-web.onrender.com' 
-                        : 'http://localhost:3000'
-                },
-                timeout: 30000
-            }
-        );
+        // Try multiple possible URLs in order (Docker, local, env)
+        const possibleUrls = [
+            'http://ml_service:5000/generate-schedule', // Docker Compose service
+            'http://localhost:5001/generate-schedule',  // Local dev (custom)
+            'http://localhost:5000/generate-schedule',  // Local dev (default Flask)
+            process.env.ML_SERVICE_URL ? `${process.env.ML_SERVICE_URL}/generate-schedule` : null
+        ].filter(Boolean);
 
-        console.log('Successfully received response from ML service');
-        return res.json(response.data);
+        const headers = {
+            'Content-Type': 'application/json',
+            'Origin': process.env.NODE_ENV === 'production'
+                ? 'https://course-scheduler-web.onrender.com'
+                : 'http://localhost:3000'
+        };
+
+        let lastError = null;
+        for (const url of possibleUrls) {
+            try {
+                console.log(`Attempting to connect to ML service at: ${url}`);
+                const response = await axios.post(url, req.body, { headers, timeout: 30000 });
+                console.log(`Successfully received response from ML service at: ${url}`);
+                return res.json(response.data);
+            } catch (error) {
+                console.warn(`Failed to connect to ${url}: ${error.message}`);
+                lastError = error;
+            }
+        }
+
+        // If none succeeded, return the last error
+        throw lastError || new Error('Failed to connect to any ML service URL');
     } catch (error) {
         console.error('Error connecting to ML service:', {
             message: error.message,
             status: error.response?.status,
-            url: `${process.env.ML_SERVICE_URL}/generate-schedule`
+            data: error.response?.data
         });
-        
+
         res.status(error.response?.status || 500).json({
             error: 'Failed to connect to ML service',
-            details: error.message
+            details: error.response?.data || error.message
         });
     }
 });

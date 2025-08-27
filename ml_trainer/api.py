@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from constraint_optimizer import ScheduleOptimizer
 from semester_based_optimizer import SemesterBasedOptimizer  # Add this import
+from run_credits_simple import create_schedule as simple_credits_create_schedule
 from data_processor import ScheduleDataProcessor
 import os
 from datetime import datetime
@@ -61,42 +62,39 @@ def generate_schedule():
         logger.info("=== Schedule Generation Request ===")
         data = request.json
         logger.info(f"Incoming payload: {json.dumps(data, indent=2)}")
-        
+
         # Process raw data into scheduler-friendly format
         processor = ScheduleDataProcessor()
         processed_data = processor.process_payload(data)
-        logger.info(f"Processed data complete with {len(processed_data['classes'])} courses")
-        
-        # Check if processing was successful
+        # Check if processing was successful before accessing classes
         if "error" in processed_data:
             logger.error(f"Data processing failed: {processed_data['error']}")
             return jsonify(processed_data), 400
-        
+        logger.info(f"Processed data complete with {len(processed_data['classes'])} courses")
+
         # Determine which optimizer to use based on approach
-        approach = processed_data["parameters"].get("approach", "credits-based")
+        approach = (processed_data.get("parameters") or {}).get("approach", "credits-based")
         logger.info(f"Using scheduling approach: {approach}")
-        
-        if approach == "semesters-based":
-            # Use the new semester-based optimizer
-            optimizer = SemesterBasedOptimizer()
+
+        # Support both spellings: 'semester-based' (preferred) and 'semesters-based' (legacy)
+        if approach in ("semester-based", "semesters-based"):
             logger.info("Using SemesterBasedOptimizer")
+            optimizer = SemesterBasedOptimizer()
+            schedule_result = optimizer.create_schedule(processed_data)
         else:
-            # Use the existing constraint optimizer for credits-based
-            optimizer = ScheduleOptimizer()
-            logger.info("Using ScheduleOptimizer (credits-based)")
-        
-        # Generate the schedule
-        schedule_result = optimizer.create_schedule(processed_data)
-        
+            # Use the simplified credits-based scheduler we built
+            logger.info("Using simple credits-based scheduler")
+            schedule_result = simple_credits_create_schedule(processed_data)
+
         # Log the result
         logger.info(f"Schedule generation complete with {len(schedule_result.get('schedule', []))} semesters")
         logger.info(f"Schedule metadata: {schedule_result.get('metadata', {})}")
-        
+
         # Check if schedule generation was successful
         if "error" in schedule_result:
             logger.error(f"Schedule generation failed: {schedule_result['error']}")
             return jsonify(schedule_result), 500
-        
+
         return jsonify({
             "metadata": schedule_result.get('metadata', {}),
             "schedule": schedule_result.get('schedule', []),

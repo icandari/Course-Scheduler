@@ -218,6 +218,59 @@ def create_schedule(processed: Dict) -> Dict:
     remaining = [c for c in courses if not is_eil_course(c)]  # schedule EIL explicitly
     scheduled_semesters: List[Dict] = []
 
+    # Helper to fill a semester bucket to its credit cap using greedy rules
+    def fill_semester(sem: Semester,
+                      bucket: List[Course],
+                      scheduled_ids: Set[int],
+                      remaining: List[Course],
+                      courses: List[Course],
+                      raw: Dict[int, Dict],
+                      major_limit: int) -> Tuple[List[Course], int]:
+        # Sort a fresh view of remaining for this semester
+        remaining.sort(key=lambda c: priority(c, remaining), reverse=True)
+        current = sum(c.credits for c in bucket)
+        # Attempt a single greedy pass (aligned with main loop behavior)
+        for course in list(remaining):
+            if course.id in scheduled_ids:
+                if course in remaining:
+                    remaining.remove(course)
+                continue
+            if not can_offer(course, sem.type):
+                continue
+            if not all_prereqs_done(course, scheduled_ids):
+                continue
+
+            bundle = get_course_and_coreqs(course, courses)
+            bundle_credits = sum(c.credits for c in bundle)
+            if current + bundle_credits > sem.credit_limit:
+                continue
+
+            # Religion rule: at most one religion per semester
+            bundle_religion = any(is_religion_course(c, raw) for c in bundle)
+            if bundle_religion:
+                has_religion = any(is_religion_course(c, raw) for c in bucket)
+                if has_religion:
+                    continue
+
+            # Major class limit
+            majors_to_add = sum(1 for c in bundle if is_major_course(c, raw))
+            current_major_count = sum(1 for c in bucket if is_major_course(c, raw))
+            if current_major_count + majors_to_add > major_limit:
+                continue
+
+            # Passed all checks; add bundle
+            for c in bundle:
+                if c in remaining:
+                    remaining.remove(c)
+            bucket.extend(bundle)
+            current += bundle_credits
+            scheduled_ids.update(c.id for c in bundle)
+
+            if current >= sem.credit_limit:
+                break
+
+        return bucket, current
+
     # 1) First semester: place required EIL, then flexible
     if semesters:
         sem0 = semesters[0]
@@ -232,6 +285,8 @@ def create_schedule(processed: Dict) -> Dict:
             if can_offer(c, sem0.type) and current + c.credits <= sem0.credit_limit:
                 taken.append(c); current += c.credits; scheduled_ids.add(c.id)
         if taken:
+            # Fill up the rest of the semester using greedy selection for non-EIL courses
+            taken, current = fill_semester(sem0, taken, scheduled_ids, remaining, courses, raw, major_limit=int(params.get("majorClassLimit") or 3))
             scheduled_semesters.append({
                 "type": sem0.type,
                 "year": sem0.year,
@@ -248,6 +303,8 @@ def create_schedule(processed: Dict) -> Dict:
             if can_offer(c, sem1.type) and current + c.credits <= sem1.credit_limit:
                 taken.append(c); current += c.credits; scheduled_ids.add(c.id)
         if taken:
+            # Fill up this semester as well using greedy selection
+            taken, current = fill_semester(sem1, taken, scheduled_ids, remaining, courses, raw, major_limit=int(params.get("majorClassLimit") or 3))
             scheduled_semesters.append({
                 "type": sem1.type,
                 "year": sem1.year,

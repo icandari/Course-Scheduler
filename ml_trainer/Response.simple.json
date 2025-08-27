@@ -1,913 +1,4 @@
 {
-    "classes": [
-        {
-            "id": 10,
-            "class_number": "CS 210",
-            "class_name": "Computer Organization",
-            "semesters_offered": [
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                4
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 4,
-            "class_number": "CS 202",
-            "class_name": "Introduction to Object-Oriented Programming",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [
-                1
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 1,
-            "class_number": "CS 101",
-            "class_name": "Introduction to Programming Fundamentals",
-            "semesters_offered": [
-                "Fall"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 11,
-            "class_number": "CS 300",
-            "class_name": "Advanced Object-Oriented Programming",
-            "semesters_offered": [
-                "Fall",
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                4
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 12,
-            "class_number": "CS 301",
-            "class_name": "Algorithms and Complexity",
-            "semesters_offered": [
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                9,
-                11
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 9,
-            "class_number": "CS 206",
-            "class_name": "Discrete Mathematics II",
-            "semesters_offered": [
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                4,
-                8
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 8,
-            "class_number": "CS 205",
-            "class_name": "Foundations of Discrete Mathematics",
-            "semesters_offered": [
-                "Fall",
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                1
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 13,
-            "class_number": "CS 320",
-            "class_name": "Introduction to Computational Theory",
-            "semesters_offered": [
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                9
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 14,
-            "class_number": "CS 401",
-            "class_name": "Web Applications Development",
-            "semesters_offered": [
-                "Fall"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                5,
-                11
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 5,
-            "class_number": "CS 250",
-            "class_name": "Database Applications",
-            "semesters_offered": [
-                "Fall",
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 15,
-            "class_number": "CS 415",
-            "class_name": "Operating Systems Design",
-            "semesters_offered": [
-                "Fall"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                10,
-                12
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 16,
-            "class_number": "CS 420",
-            "class_name": "Programming Languages",
-            "semesters_offered": [
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                12,
-                13
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 722,
-            "class_number": "CS 235",
-            "class_name": "Data Structures",
-            "semesters_offered": [],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                4
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 2,
-            "class_number": "IT 124",
-            "class_name": "Information Technology Essentials",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 3,
-            "class_number": "CS 140",
-            "class_name": "Web Design",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 6,
-            "class_number": "CS 311",
-            "class_name": "Systems Engineering",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                4,
-                5
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 7,
-            "class_number": "HIST 470",
-            "class_name": "History and Ethics of Computing",
-            "semesters_offered": [
-                "Fall",
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                27
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 27,
-            "class_number": "ENGL 315",
-            "class_name": "Topics for Advanced Writing and Analysis",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "Junior and above",
-            "prerequisites": [
-                26
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 26,
-            "class_number": "ENGL 101",
-            "class_name": "College Writing, Reading, and Research",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "Freshman and above",
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 21,
-            "class_number": "MATH 121",
-            "class_name": "Principles of Statistics",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                20
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 20,
-            "class_number": "MATH 107",
-            "class_name": "Quantitative Reasoning",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 22,
-            "class_number": "MATH 212",
-            "class_name": "Calculus I",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 4,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 347,
-            "class_number": "MATH 301",
-            "class_name": "Foundations of Mathematics",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [
-                22
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 37,
-            "class_number": "PAIS 105",
-            "class_name": "Introduction to Pacific Studies",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
-            "id": 38,
-            "class_number": "PAIS 200",
-            "class_name": "Recognizing Place, Purpose, and Positionality on Native Land",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [
-                37
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
-            "id": 28,
-            "class_number": "ENTR 180",
-            "class_name": "New Venture Finance",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
-            "id": 29,
-            "class_number": "ENTR 275",
-            "class_name": "Leadership and the Gospel of Jesus Christ: Becoming a Disciple Leader",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
-            "id": 30,
-            "class_number": "ENTR 283",
-            "class_name": "New Venture Creation",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [
-                28
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
-            "id": 31,
-            "class_number": "ENTR 285",
-            "class_name": "New Venture Growth Strategies",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                28,
-                35
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
-            "id": 35,
-            "class_number": "HTM 133",
-            "class_name": "Introduction to Hospitality and Tourism Management",
-            "semesters_offered": [
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
-            "id": 32,
-            "class_number": "ENTR 483",
-            "class_name": "New Venture Management",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [
-                30,
-                31
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
-            "id": 46,
-            "class_number": "REL 200",
-            "class_name": "The Eternal Family",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 2,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "religion"
-        },
-        {
-            "id": 47,
-            "class_number": "REL 225",
-            "class_name": "Foundations of the Restoration",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 2,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "religion"
-        },
-        {
-            "id": 48,
-            "class_number": "REL 250",
-            "class_name": "Jesus Christ and the Everlasting Gospel",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 2,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "religion"
-        },
-        {
-            "id": 49,
-            "class_number": "REL 275",
-            "class_name": "The Teachings and Doctrine of the Book of Mormon",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 2,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "religion"
-        },
-        {
-            "id": 60,
-            "class_number": "STDEV 100R",
-            "class_name": "Holokai Foundations",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 1,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "EIL"
-        },
-        {
-            "id": 71,
-            "class_number": "CHEM 101L",
-            "class_name": "Introduction to Chemistry Lab",
-            "semesters_offered": [
-                "Fall",
-                "Winter"
-            ],
-            "credits": 1,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [],
-            "corequisites": [
-                70
-            ],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 70,
-            "class_number": "CHEM 101",
-            "class_name": "Introduction to General Chemistry",
-            "semesters_offered": [
-                "Fall",
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [],
-            "corequisites": [
-                71
-            ],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 73,
-            "class_number": "BIOL 112L",
-            "class_name": "Biology I - Cell and Molecular Biology Lab",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 1,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [
-                72
-            ],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 72,
-            "class_number": "BIOL 112",
-            "class_name": "Biology I - Cell and Molecular Biology",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [
-                73
-            ],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 40,
-            "class_number": "PAIS 220",
-            "class_name": "Pacific Social Development",
-            "semesters_offered": [
-                "Fall",
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [
-                37
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
-            "id": 41,
-            "class_number": "PAIS 250",
-            "class_name": "Polynesian Dance and Performance",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
-            "id": 44,
-            "class_number": "PAIS 330",
-            "class_name": "Sovereignty and Self Governance in Oceania",
-            "semesters_offered": [
-                "Fall",
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [
-                37
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
-            "id": 51,
-            "class_number": "REL 261",
-            "class_name": "Family History (Genealogy)",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 2,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "religion"
-        },
-        {
-            "id": 54,
-            "class_number": "REL 342",
-            "class_name": "Latter-day Saint History 1846-1893",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 2,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "religion"
-        },
-        {
-            "id": 57,
-            "class_number": "REL 211",
-            "class_name": "New Testament I",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 2,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "religion"
-        },
-        {
-            "id": 723,
-            "class_number": "CS 440",
-            "class_name": "Data Visualization",
-            "semesters_offered": [
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                12
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 724,
-            "class_number": "CS 404",
-            "class_name": "Advanced Web Applications",
-            "semesters_offered": [
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                14
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        }
-    ],
-    "preferences": {
-        "startSemester": "Winter 2025",
-        "majorClassLimit": 4,
-        "fallWinterCredits": 16,
-        "springCredits": 10,
-        "approach": "credits-based",
-        "limitFirstYear": true,
-        "firstYearLimits": {
-            "fallWinterCredits": 15,
-            "springCredits": 10
-        }
-    },
     "schedule": [
         {
             "type": "Winter",
@@ -926,14 +17,21 @@
                         "Spring"
                     ],
                     "from_course": "eil"
-                }
-            ],
-            "totalCredits": 1
-        },
-        {
-            "type": "Spring",
-            "year": 2025,
-            "classes": [
+                },
+                {
+                    "id": 62,
+                    "class_name": "The Int'l Student in the University",
+                    "class_number": "EIL 201",
+                    "credits": 2,
+                    "prerequisites": [],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall",
+                        "Winter",
+                        "Spring"
+                    ],
+                    "from_course": "eil"
+                },
                 {
                     "id": 46,
                     "class_name": "The Eternal Family",
@@ -947,65 +45,6 @@
                         "Spring"
                     ],
                     "from_course": "religion"
-                },
-                {
-                    "id": 35,
-                    "class_name": "Introduction to Hospitality and Tourism Management",
-                    "class_number": "HTM 133",
-                    "credits": 3,
-                    "prerequisites": [],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Spring"
-                    ],
-                    "from_course": "minor"
-                },
-                {
-                    "id": 2,
-                    "class_name": "Information Technology Essentials",
-                    "class_number": "IT 124",
-                    "credits": 3,
-                    "prerequisites": [],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Fall",
-                        "Winter",
-                        "Spring"
-                    ],
-                    "from_course": "major"
-                }
-            ],
-            "totalCredits": 8
-        },
-        {
-            "type": "Fall",
-            "year": 2025,
-            "classes": [
-                {
-                    "id": 47,
-                    "class_name": "Foundations of the Restoration",
-                    "class_number": "REL 225",
-                    "credits": 2,
-                    "prerequisites": [],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Fall",
-                        "Winter",
-                        "Spring"
-                    ],
-                    "from_course": "religion"
-                },
-                {
-                    "id": 1,
-                    "class_name": "Introduction to Programming Fundamentals",
-                    "class_number": "CS 101",
-                    "credits": 3,
-                    "prerequisites": [],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Fall"
-                    ],
-                    "from_course": "major"
                 },
                 {
                     "id": 5,
@@ -1051,9 +90,9 @@
                     "from_course": "major"
                 },
                 {
-                    "id": 28,
-                    "class_name": "New Venture Finance",
-                    "class_number": "ENTR 180",
+                    "id": 2,
+                    "class_name": "Information Technology Essentials",
+                    "class_number": "IT 124",
                     "credits": 3,
                     "prerequisites": [],
                     "corequisites": [],
@@ -1062,14 +101,61 @@
                         "Winter",
                         "Spring"
                     ],
-                    "from_course": "minor"
+                    "from_course": "major"
                 }
             ],
             "totalCredits": 15
         },
         {
-            "type": "Winter",
-            "year": 2026,
+            "type": "Spring",
+            "year": 2025,
+            "classes": [
+                {
+                    "id": 65,
+                    "class_name": "Academic English II",
+                    "class_number": "EIL 320",
+                    "credits": 4,
+                    "prerequisites": [],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall",
+                        "Winter",
+                        "Spring"
+                    ],
+                    "from_course": "eil"
+                },
+                {
+                    "id": 47,
+                    "class_name": "Foundations of the Restoration",
+                    "class_number": "REL 225",
+                    "credits": 2,
+                    "prerequisites": [],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall",
+                        "Winter",
+                        "Spring"
+                    ],
+                    "from_course": "religion"
+                },
+                {
+                    "id": 35,
+                    "class_name": "Introduction to Hospitality and Tourism Management",
+                    "class_number": "HTM 133",
+                    "credits": 3,
+                    "prerequisites": [],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Spring"
+                    ],
+                    "from_course": "minor"
+                }
+            ],
+            "totalCredits": 9
+        },
+        {
+            "type": "Fall",
+            "year": 2025,
             "classes": [
                 {
                     "id": 48,
@@ -1086,21 +172,79 @@
                     "from_course": "religion"
                 },
                 {
-                    "id": 31,
-                    "class_name": "New Venture Growth Strategies",
-                    "class_number": "ENTR 285",
+                    "id": 1,
+                    "class_name": "Introduction to Programming Fundamentals",
+                    "class_number": "CS 101",
                     "credits": 3,
-                    "prerequisites": [
-                        28,
-                        35
+                    "prerequisites": [],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall"
                     ],
+                    "from_course": "major"
+                },
+                {
+                    "id": 3,
+                    "class_name": "Web Design",
+                    "class_number": "CS 140",
+                    "credits": 3,
+                    "prerequisites": [],
                     "corequisites": [],
                     "semesters_offered": [
                         "Fall",
                         "Winter",
                         "Spring"
                     ],
-                    "from_course": "minor"
+                    "from_course": "major"
+                },
+                {
+                    "id": 20,
+                    "class_name": "Quantitative Reasoning",
+                    "class_number": "MATH 107",
+                    "credits": 3,
+                    "prerequisites": [],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall",
+                        "Winter",
+                        "Spring"
+                    ],
+                    "from_course": "major"
+                },
+                {
+                    "id": 22,
+                    "class_name": "Calculus I",
+                    "class_number": "MATH 212",
+                    "credits": 4,
+                    "prerequisites": [],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall",
+                        "Winter",
+                        "Spring"
+                    ],
+                    "from_course": "major"
+                }
+            ],
+            "totalCredits": 15
+        },
+        {
+            "type": "Winter",
+            "year": 2026,
+            "classes": [
+                {
+                    "id": 49,
+                    "class_name": "The Teachings and Doctrine of the Book of Mormon",
+                    "class_number": "REL 275",
+                    "credits": 2,
+                    "prerequisites": [],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall",
+                        "Winter",
+                        "Spring"
+                    ],
+                    "from_course": "religion"
                 },
                 {
                     "id": 8,
@@ -1134,12 +278,12 @@
                     "from_course": "major"
                 },
                 {
-                    "id": 30,
-                    "class_name": "New Venture Creation",
-                    "class_number": "ENTR 283",
+                    "id": 21,
+                    "class_name": "Principles of Statistics",
+                    "class_number": "MATH 121",
                     "credits": 3,
                     "prerequisites": [
-                        28
+                        20
                     ],
                     "corequisites": [],
                     "semesters_offered": [
@@ -1147,7 +291,23 @@
                         "Winter",
                         "Spring"
                     ],
-                    "from_course": "minor"
+                    "from_course": "major"
+                },
+                {
+                    "id": 347,
+                    "class_name": "Foundations of Mathematics",
+                    "class_number": "MATH 301",
+                    "credits": 3,
+                    "prerequisites": [
+                        22
+                    ],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall",
+                        "Winter",
+                        "Spring"
+                    ],
+                    "from_course": "major"
                 }
             ],
             "totalCredits": 14
@@ -1157,9 +317,9 @@
             "year": 2026,
             "classes": [
                 {
-                    "id": 49,
-                    "class_name": "The Teachings and Doctrine of the Book of Mormon",
-                    "class_number": "REL 275",
+                    "id": 51,
+                    "class_name": "Family History (Genealogy)",
+                    "class_number": "REL 261",
                     "credits": 2,
                     "prerequisites": [],
                     "corequisites": [],
@@ -1211,9 +371,9 @@
             "year": 2026,
             "classes": [
                 {
-                    "id": 51,
-                    "class_name": "Family History (Genealogy)",
-                    "class_number": "REL 261",
+                    "id": 52,
+                    "class_name": "Teachings of the Living Prophets",
+                    "class_number": "REL 333",
                     "credits": 2,
                     "prerequisites": [],
                     "corequisites": [],
@@ -1223,23 +383,6 @@
                         "Spring"
                     ],
                     "from_course": "religion"
-                },
-                {
-                    "id": 32,
-                    "class_name": "New Venture Management",
-                    "class_number": "ENTR 483",
-                    "credits": 3,
-                    "prerequisites": [
-                        30,
-                        31
-                    ],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Fall",
-                        "Winter",
-                        "Spring"
-                    ],
-                    "from_course": "minor"
                 },
                 {
                     "id": 11,
@@ -1257,9 +400,9 @@
                     "from_course": "major"
                 },
                 {
-                    "id": 3,
-                    "class_name": "Web Design",
-                    "class_number": "CS 140",
+                    "id": 26,
+                    "class_name": "College Writing, Reading, and Research",
+                    "class_number": "ENGL 101",
                     "credits": 3,
                     "prerequisites": [],
                     "corequisites": [],
@@ -1271,9 +414,9 @@
                     "from_course": "major"
                 },
                 {
-                    "id": 20,
-                    "class_name": "Quantitative Reasoning",
-                    "class_number": "MATH 107",
+                    "id": 28,
+                    "class_name": "New Venture Finance",
+                    "class_number": "ENTR 180",
                     "credits": 3,
                     "prerequisites": [],
                     "corequisites": [],
@@ -1282,7 +425,21 @@
                         "Winter",
                         "Spring"
                     ],
-                    "from_course": "major"
+                    "from_course": "minor"
+                },
+                {
+                    "id": 29,
+                    "class_name": "Leadership and the Gospel of Jesus Christ: Becoming a Disciple Leader",
+                    "class_number": "ENTR 275",
+                    "credits": 3,
+                    "prerequisites": [],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall",
+                        "Winter",
+                        "Spring"
+                    ],
+                    "from_course": "minor"
                 }
             ],
             "totalCredits": 14
@@ -1292,9 +449,9 @@
             "year": 2027,
             "classes": [
                 {
-                    "id": 54,
-                    "class_name": "Latter-day Saint History 1846-1893",
-                    "class_number": "REL 342",
+                    "id": 57,
+                    "class_name": "New Testament I",
+                    "class_number": "REL 211",
                     "credits": 2,
                     "prerequisites": [],
                     "corequisites": [],
@@ -1319,6 +476,23 @@
                         "Winter"
                     ],
                     "from_course": "major"
+                },
+                {
+                    "id": 31,
+                    "class_name": "New Venture Growth Strategies",
+                    "class_number": "ENTR 285",
+                    "credits": 3,
+                    "prerequisites": [
+                        28,
+                        35
+                    ],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall",
+                        "Winter",
+                        "Spring"
+                    ],
+                    "from_course": "minor"
                 },
                 {
                     "id": 10,
@@ -1347,20 +521,6 @@
                         "Winter"
                     ],
                     "from_course": "major"
-                },
-                {
-                    "id": 723,
-                    "class_name": "Data Visualization",
-                    "class_number": "CS 440",
-                    "credits": 3,
-                    "prerequisites": [
-                        12
-                    ],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Winter"
-                    ],
-                    "from_course": "major"
                 }
             ],
             "totalCredits": 14
@@ -1369,20 +529,6 @@
             "type": "Spring",
             "year": 2027,
             "classes": [
-                {
-                    "id": 57,
-                    "class_name": "New Testament I",
-                    "class_number": "REL 211",
-                    "credits": 2,
-                    "prerequisites": [],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Fall",
-                        "Winter",
-                        "Spring"
-                    ],
-                    "from_course": "religion"
-                },
                 {
                     "id": 16,
                     "class_name": "Programming Languages",
@@ -1399,12 +545,12 @@
                     "from_course": "major"
                 },
                 {
-                    "id": 21,
-                    "class_name": "Principles of Statistics",
-                    "class_number": "MATH 121",
+                    "id": 27,
+                    "class_name": "Topics for Advanced Writing and Analysis",
+                    "class_number": "ENGL 315",
                     "credits": 3,
                     "prerequisites": [
-                        20
+                        26
                     ],
                     "corequisites": [],
                     "semesters_offered": [
@@ -1413,9 +559,25 @@
                         "Spring"
                     ],
                     "from_course": "major"
+                },
+                {
+                    "id": 30,
+                    "class_name": "New Venture Creation",
+                    "class_number": "ENTR 283",
+                    "credits": 3,
+                    "prerequisites": [
+                        28
+                    ],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall",
+                        "Winter",
+                        "Spring"
+                    ],
+                    "from_course": "minor"
                 }
             ],
-            "totalCredits": 8
+            "totalCredits": 9
         },
         {
             "type": "Fall",
@@ -1452,39 +614,14 @@
                     "from_course": "major"
                 },
                 {
-                    "id": 22,
-                    "class_name": "Calculus I",
-                    "class_number": "MATH 212",
-                    "credits": 4,
-                    "prerequisites": [],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Fall",
-                        "Winter",
-                        "Spring"
-                    ],
-                    "from_course": "major"
-                },
-                {
-                    "id": 26,
-                    "class_name": "College Writing, Reading, and Research",
-                    "class_number": "ENGL 101",
+                    "id": 32,
+                    "class_name": "New Venture Management",
+                    "class_number": "ENTR 483",
                     "credits": 3,
-                    "prerequisites": [],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Fall",
-                        "Winter",
-                        "Spring"
+                    "prerequisites": [
+                        30,
+                        31
                     ],
-                    "from_course": "major"
-                },
-                {
-                    "id": 29,
-                    "class_name": "Leadership and the Gospel of Jesus Christ: Becoming a Disciple Leader",
-                    "class_number": "ENTR 275",
-                    "credits": 3,
-                    "prerequisites": [],
                     "corequisites": [],
                     "semesters_offered": [
                         "Fall",
@@ -1492,46 +629,43 @@
                         "Spring"
                     ],
                     "from_course": "minor"
+                },
+                {
+                    "id": 17,
+                    "class_name": "Advanced Topics in Computer Science",
+                    "class_number": "CS 490R",
+                    "credits": 3,
+                    "prerequisites": [
+                        12
+                    ],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall"
+                    ],
+                    "from_course": "major"
+                },
+                {
+                    "id": 7,
+                    "class_name": "History and Ethics of Computing",
+                    "class_number": "HIST 470",
+                    "credits": 3,
+                    "prerequisites": [
+                        27
+                    ],
+                    "corequisites": [],
+                    "semesters_offered": [
+                        "Fall",
+                        "Winter"
+                    ],
+                    "from_course": "major"
                 }
             ],
-            "totalCredits": 16
+            "totalCredits": 15
         },
         {
             "type": "Winter",
             "year": 2028,
             "classes": [
-                {
-                    "id": 27,
-                    "class_name": "Topics for Advanced Writing and Analysis",
-                    "class_number": "ENGL 315",
-                    "credits": 3,
-                    "prerequisites": [
-                        26
-                    ],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Fall",
-                        "Winter",
-                        "Spring"
-                    ],
-                    "from_course": "major"
-                },
-                {
-                    "id": 347,
-                    "class_name": "Foundations of Mathematics",
-                    "class_number": "MATH 301",
-                    "credits": 3,
-                    "prerequisites": [
-                        22
-                    ],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Fall",
-                        "Winter",
-                        "Spring"
-                    ],
-                    "from_course": "major"
-                },
                 {
                     "id": 37,
                     "class_name": "Introduction to Pacific Studies",
@@ -1593,7 +727,7 @@
                     "from_course": "major"
                 }
             ],
-            "totalCredits": 16
+            "totalCredits": 10
         },
         {
             "type": "Spring",
@@ -1637,21 +771,6 @@
             "year": 2028,
             "classes": [
                 {
-                    "id": 7,
-                    "class_name": "History and Ethics of Computing",
-                    "class_number": "HIST 470",
-                    "credits": 3,
-                    "prerequisites": [
-                        27
-                    ],
-                    "corequisites": [],
-                    "semesters_offered": [
-                        "Fall",
-                        "Winter"
-                    ],
-                    "from_course": "major"
-                },
-                {
                     "id": 40,
                     "class_name": "Pacific Social Development",
                     "class_number": "PAIS 220",
@@ -1667,9 +786,9 @@
                     "from_course": "minor"
                 },
                 {
-                    "id": 44,
-                    "class_name": "Sovereignty and Self Governance in Oceania",
-                    "class_number": "PAIS 330",
+                    "id": 45,
+                    "class_name": "Anti-Racism and Belonging: Pacific Dialogue",
+                    "class_number": "PAIS 340",
                     "credits": 3,
                     "prerequisites": [
                         37
@@ -1682,12 +801,13 @@
                     "from_course": "minor"
                 }
             ],
-            "totalCredits": 9
+            "totalCredits": 6
         }
     ],
     "metadata": {
         "approach": "credits-based",
         "startSemester": "Winter 2025",
-        "generatedAt": "2025-08-27T00:42:40.122349"
+        "eilLevel": "EIL Level 2",
+        "generatedAt": "2025-08-27T01:19:36.378799"
     }
 }

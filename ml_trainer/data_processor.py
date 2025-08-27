@@ -77,8 +77,14 @@ class ScheduleDataProcessor:
         # Add detailed logging for dependencies
         processed_data = self._process_payload_internal(payload)
         
-        logger.info(f"Processed {len(processed_data['classes'])} classes")
-        logger.info(f"First 3 processed classes: {list(processed_data['classes'].items())[:3]}")
+        # Only log class details if processing succeeded
+        if isinstance(processed_data, dict) and 'classes' in processed_data:
+            try:
+                logger.info(f"Processed {len(processed_data['classes'])} classes")
+                logger.info(f"First 3 processed classes: {list(processed_data['classes'].items())[:3]}")
+            except Exception:
+                # Avoid breaking on logging if something is off
+                pass
         
         return processed_data
 
