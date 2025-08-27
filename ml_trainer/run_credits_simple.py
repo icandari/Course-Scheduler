@@ -39,23 +39,30 @@ EIL_SET = {"STDEV 100R", "EIL 201", "EIL 313", "EIL 317", "EIL 320"}
 
 
 def is_religion_course(course: Course, src: Dict[int, Dict]) -> bool:
-    # Prefer from_course label when present; fallback to class_number prefix
-    from_course = src.get(course.id, {}).get("from_course")
-    if isinstance(from_course, str) and from_course.lower() == "religion":
+    # Prefer normalized from_course; fallback to raw src and class_number prefix
+    if isinstance(course.from_course, str) and course.from_course.lower() == "religion":
         return True
-    return course.class_number.startswith("REL ")
+    from_course = src.get(course.id, {}).get("from_course")
+    if isinstance(from_course, str) and str(from_course).lower() == "religion":
+        return True
+    return str(course.class_number or "").startswith("REL ")
 
 
 def is_eil_course(course: Course) -> bool:
+    if isinstance(course.from_course, str) and course.from_course.lower() == "eil":
+        return True
     return course.class_number in EIL_SET
 
 
 def is_major_course(course: Course, src: Dict[int, Dict]) -> bool:
-    # Heuristic: CS classes are treated as major; extend as needed
-    from_course = src.get(course.id, {}).get("from_course")
-    if isinstance(from_course, str) and from_course.lower() in {"computer science", "cs"}:
+    # Use normalized from_course first; fallback to raw label and weak prefix heuristic
+    if isinstance(course.from_course, str) and course.from_course.lower() == "major":
         return True
-    return course.class_number.startswith("CS ")
+    from_course = src.get(course.id, {}).get("from_course")
+    if isinstance(from_course, str) and str(from_course).lower() == "major":
+        return True
+    # As a last resort, try a department prefix (project-specific; keep minimal)
+    return str(course.class_number or "").startswith("CS ")
 
 
 def convert_to_courses(raw: Dict[int, Dict]) -> List[Course]:
@@ -157,8 +164,13 @@ def priority(course: Course, all_courses: List[Course]) -> Tuple[int, int, int, 
     dependents = sum(1 for c in all_courses if (course.id in (c.prerequisites or [])))
     flexibility = len(course.semesters_offered or [])
     # Negative flexibility to sort fewer offerings first when reversed
+    is_priority = 1 if (
+        (isinstance(course.from_course, str) and course.from_course.lower() in {"religion", "eil"})
+        or str(course.class_number or "").startswith("REL ")
+        or course.class_number in EIL_SET
+    ) else 0
     return (
-        1 if course.class_number.startswith("REL ") or course.class_number in EIL_SET else 0,
+        is_priority,
         len(course.prerequisites or []),
         dependents,
         -flexibility,
@@ -250,9 +262,14 @@ def create_schedule(processed: Dict) -> Dict:
     remaining.sort(key=lambda c: priority(c, remaining), reverse=True)
 
     sem_idx = len(scheduled_semesters)
+    no_progress = 0
+    MAX_TOTAL_SEMESTERS = 24  # hard stop
     while remaining:
         if sem_idx >= len(semesters):
-            # Extend semesters if needed
+            # Extend semesters if needed, but cap total count
+            if len(semesters) >= MAX_TOTAL_SEMESTERS:
+                logger.info("Reached max semesters without scheduling more courses; stopping.")
+                break
             last = semesters[-1]
             next_type = next_semester_type(last.type)
             next_year = last.year + 1 if last.type == "Fall" else last.year if last.type == "Winter" else last.year
@@ -263,17 +280,15 @@ def create_schedule(processed: Dict) -> Dict:
 
         bucket: List[Course] = []
         current = 0
-        semester_has_religion = any(
-            is_religion_course(courses_by_id.get(cc["id"], Course(0, "", "", 0, [], [], [])), raw)
-            for s in scheduled_semesters[-1:] for cc in s.get("classes", [])
-        ) if scheduled_semesters and sem_idx < len(scheduled_semesters) else False
+    # Note: semester_has_religion is enforced within the bucket via bundle checks
 
         # Greedy pick
         picked_any = False
         for course in list(remaining):
             # Skip if already scheduled due to EIL steps
             if course.id in scheduled_ids:
-                remaining.remove(course)
+                if course in remaining:
+                    remaining.remove(course)
                 continue
 
             if not can_offer(course, sem.type):
@@ -321,13 +336,19 @@ def create_schedule(processed: Dict) -> Dict:
                 "classes": [course_to_dict(c, raw) for c in bucket],
                 "totalCredits": current
             })
+            no_progress = 0
         elif not picked_any:
             # No course could be scheduled in this semester; advance
-            pass
+            no_progress += 1
+            # If we've cycled through many terms with no progress, stop
+            if no_progress >= 9:  # roughly 3 academic years worth of no progress
+                logger.info("No schedulable courses for multiple consecutive terms; stopping.")
+                break
 
         sem_idx += 1
-        # Safety break
-        if sem_idx > len(semesters) + 10:
+        # Safety break (secondary)
+        if len(semesters) > MAX_TOTAL_SEMESTERS:
+            logger.info("Exceeded max planned semesters; stopping.")
             break
 
     # Simple post-optimization: try to move a lone religion course from the last semester earlier if space
@@ -337,6 +358,7 @@ def create_schedule(processed: Dict) -> Dict:
         "metadata": {
             "approach": "credits-based",
             "startSemester": start_semester,
+            "eilLevel": (processed.get("parameters", {}) or {}).get("eilLevel"),
             "generatedAt": datetime.now().isoformat()
         },
         "schedule": scheduled_semesters
@@ -393,22 +415,24 @@ def run_scheduler(input_path: str, output_path: Optional[str] = None) -> Dict:
 
     result = create_schedule(processed)
 
-    updated_payload = payload.copy()
-    updated_payload["schedule"] = result["schedule"]
-    updated_payload["metadata"] = result["metadata"]
+    output = {"schedule": result["schedule"], "metadata": result["metadata"]}
 
     if output_path:
         with open(output_path, "w") as f:
-            json.dump(updated_payload, f, indent=4)
+            json.dump(output, f, indent=4)
         logger.info(f"Saved schedule to {output_path}")
 
-    return updated_payload
+    return output
 
 
 if __name__ == "__main__":
     import sys
-    inp = sys.argv[1] if len(sys.argv) > 1 else "ml_trainer/creditspayload.json"
-    out = sys.argv[2] if len(sys.argv) > 2 else "ml_trainer/Response.simple.json"
+    from pathlib import Path
+    here = Path(__file__).resolve().parent
+    default_in = str(here / "creditspayload.json")
+    default_out = str(here / "Response.simple.json")
+    inp = sys.argv[1] if len(sys.argv) > 1 else default_in
+    out = sys.argv[2] if len(sys.argv) > 2 else default_out
     try:
         run_scheduler(inp, out)
         logger.info("Schedule generation completed")

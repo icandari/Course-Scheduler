@@ -12,6 +12,53 @@ class ScheduleDataProcessor:
     def __init__(self):
         self.class_dependencies = {}
         self.class_info = {}
+    
+    def _normalize_from_course(self, label: Any = None, *, course_type: Any = None, class_number: Any = None, course_name: Any = None) -> str:
+        """Return one of {'major','minor','eil','religion'} based on provided hints.
+        Accepts legacy/free-form inputs and coerces to our enum. Defaults to 'major'.
+        """
+        def _coerce_str(x):
+            try:
+                return str(x) if x is not None else ""
+            except Exception:
+                return ""
+
+        s = _coerce_str(label).strip().lower()
+        if s in {"major", "minor", "eil", "religion"}:
+            return s
+        # Map common variants
+        if any(k in s for k in ["relig", "rel "]):
+            return "religion"
+        if "eil" in s:
+            return "eil"
+        if "minor" in s:
+            return "minor"
+        if "major" in s:
+            return "major"
+
+        # Fallback to course_type semantics if available
+        ct = _coerce_str(course_type).strip().lower()
+        if ct in {"major", "minor", "eil", "religion"}:
+            return ct
+        if any(k in ct for k in ["relig", "rel "]):
+            return "religion"
+        if "eil" in ct:
+            return "eil"
+        if "minor" in ct:
+            return "minor"
+        if "major" in ct:
+            return "major"
+
+        # Infer from class number/name
+        cn = _coerce_str(class_number).strip().upper()
+        name = _coerce_str(course_name).strip().upper()
+        if cn.startswith("REL "):
+            return "religion"
+        if "EIL" in cn or "EIL" in name or "STDEV 100R" in cn or "STDEV 100R" in name:
+            return "eil"
+
+        # Default
+        return "major"
         
     def process_payload(self, payload: Dict) -> Dict:
         logger.info("Starting payload processing")
@@ -63,6 +110,12 @@ class ScheduleDataProcessor:
                         if isinstance(vid, int):
                             out.append(vid)
                     return out
+                normalized_from = self._normalize_from_course(
+                    cls.get("from_course"),
+                    course_type=cls.get("course_type"),
+                    class_number=cls.get("class_number"),
+                    course_name=cls.get("class_name"),
+                )
                 all_classes[cls_id] = {
                     "id": cls_id,
                     "class_name": cls.get("class_name"),
@@ -75,7 +128,7 @@ class ScheduleDataProcessor:
                     "corequisites": norm_ids(cls.get("corequisites")),
                     "days_offered": cls.get("days_offered", []),
                     "times_offered": cls.get("times_offered", []),
-                    "from_course": cls.get("from_course"),
+                    "from_course": normalized_from,
                     # Legacy fields not available in new payload
                     "course_id": None,
                     "course_type": None,
@@ -99,22 +152,30 @@ class ScheduleDataProcessor:
                         cls_id = cls.get("id")
                         if cls_id is None:
                             continue
+                        normalized_from = self._normalize_from_course(
+                            None,
+                            course_type=course_type,
+                            class_number=cls.get("class_number"),
+                            course_name=cls.get("class_name"),
+                        )
                         all_classes[cls_id] = {
                             **cls,
                             "course_id": course_id,
                             "course_type": course_type,
                             "section_id": section.get("id"),
                             "is_elective_section": is_elective_section,
-                            "credits_needed": credits_needed
+                            "credits_needed": credits_needed,
+                            "from_course": normalized_from,
                         }
         
         # Map prerequisites and corequisites using IDs
         self._map_class_dependencies(all_classes)
-        
+
         # Extract scheduling approach and parameters (support both styles)
         approach = preferences.get("approach")
         start_semester = preferences.get("startSemester")
         limit_first_year = preferences.get("limitFirstYear", False)
+        eil_level = preferences.get("eilLevel")
         # Only present for credits-based
         fall_winter_credits = preferences.get("fallWinterCredits")
         spring_credits = preferences.get("springCredits")
@@ -125,15 +186,16 @@ class ScheduleDataProcessor:
             "approach": approach,
             "startSemester": start_semester,
             "limitFirstYear": limit_first_year,
+            "eilLevel": eil_level,
             # Credits-based knobs (may be None for semester-based)
             "fallWinterCredits": fall_winter_credits,
             "springCredits": spring_credits,
             "majorClassLimit": major_class_limit,
             "firstYearLimits": first_year_limits,
         }
-        
+
         logger.info(f"Processed scheduling parameters: {json.dumps(scheduling_params, indent=2)}")
-        
+
         # Validate class data before returning
         for cls_id, cls_info in all_classes.items():
             required_fields = ["class_name", "credits", "semesters_offered"]
@@ -141,17 +203,18 @@ class ScheduleDataProcessor:
                 if field not in cls_info:
                     logger.error(f"Missing required field {field} in class {cls_id}")
                     return {"error": f"Invalid class data: missing {field}"}
-        
+
         # Add metadata to processed data
         processed_data = {
             "classes": all_classes,
             "parameters": scheduling_params,
             "metadata": {
                 "total_classes": len(all_classes),
-                "processing_timestamp": datetime.now().isoformat()
+                "processing_timestamp": datetime.now().isoformat(),
+                "eilLevel": eil_level,
             }
         }
-        
+
         return processed_data
     
     def _process_additional_classes(self, course: Dict, all_classes: Dict):
@@ -168,14 +231,20 @@ class ScheduleDataProcessor:
                         if coreq_id in all_classes:
                             course_type = all_classes[coreq_id].get("course_type", "system")
                             break
-            
+                normalized_from = self._normalize_from_course(
+                    None,
+                    course_type=course_type,
+                    class_number=cls.get("class_number"),
+                    course_name=cls.get("class_name"),
+                )
                 all_classes[cls_id] = {
                     **cls,
                     "course_id": "additional",
                     "course_type": course_type,
                     "section_id": section.get("id"),
                     "is_elective_section": False,
-                    "credits_needed": None
+                    "credits_needed": None,
+                    "from_course": normalized_from,
                 }
     
     def _map_class_dependencies(self, all_classes: Dict):

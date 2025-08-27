@@ -775,6 +775,98 @@ function buildRequiredAndSelectedClasses(courseData, chosenElectives) {
   return Array.from(outMap.values());
 }
 
+// Ensure EIL-level required classes are included regardless of elective/required flags
+async function includeEILLevelClasses(courseData, classes, eilLevel) {
+  const level = (eilLevel || '').toLowerCase();
+  if (!level || level === 'fluent' || level === 'none') return classes;
+  const want = new Set(
+    level.includes('level 1')
+      ? ['STDEV 100R', 'EIL 201', 'EIL 313', 'EIL 317', 'EIL 320']
+      : ['STDEV 100R', 'EIL 201', 'EIL 320']
+  );
+
+  const byId = new Map((classes || []).map(c => [c.id, c]));
+  const idx = buildClassIndex(courseData);
+
+  const toPayload = (cls) => ({
+    id: cls.id,
+    class_number: cls.class_number || '',
+    class_name: cls.class_name || '',
+    semesters_offered: Array.isArray(cls.semesters_offered) ? cls.semesters_offered : [],
+    credits: Number(cls.credits) || 0,
+    is_senior_class: !!cls.is_senior_class,
+    restrictions: cls.restrictions ?? null,
+    prerequisites: normalizeIdArray(cls.prerequisites),
+    corequisites: normalizeIdArray(cls.corequisites),
+    days_offered: Array.isArray(cls.days_offered) ? cls.days_offered : [],
+    times_offered: Array.isArray(cls.times_offered) ? cls.times_offered : [],
+    from_course: 'EIL'
+  });
+
+  // Fetch a class by class_number if it's not present in our index
+  const fetchClassByNumber = async (classNumber) => {
+    try {
+      const search = await fetch(`/api/classes/search?query=${encodeURIComponent(classNumber)}&limit=3`);
+      if (!search.ok) return null;
+      const res = await search.json();
+      const hit = (res.classes || []).find(c => String(c.class_number).toUpperCase() === classNumber.toUpperCase());
+      if (!hit) return null;
+      const detail = await fetch(`/api/classes/${hit.id}?fields=essential`);
+      if (!detail.ok) return null;
+      return await detail.json();
+    } catch { return null; }
+  };
+
+  // Recursive add with dependency closure, fetching missing deps as needed
+  const addWithDeps = async (startId) => {
+    const stack = [startId];
+    const visited = new Set();
+    while (stack.length) {
+      const id = stack.pop();
+      if (visited.has(id)) continue;
+      visited.add(id);
+      let cls = idx.get(id);
+      if (!cls) {
+        // Try to fetch by ID when not indexed
+        try {
+          const resp = await fetch(`/api/classes/${id}?fields=essential`);
+          if (resp.ok) {
+            cls = await resp.json();
+            // augment the index for downstream deps
+            if (cls && (cls.id || cls.id === 0)) idx.set(cls.id, cls);
+          }
+        } catch {}
+      }
+      if (!cls) continue;
+      if (!byId.has(id)) byId.set(id, toPayload(cls));
+      const prereqs = normalizeIdArray(cls.prerequisites);
+      const coreqs = normalizeIdArray(cls.corequisites);
+      for (const depId of [...prereqs, ...coreqs]) {
+        if (depId != null && !visited.has(depId)) stack.push(depId);
+      }
+    }
+  };
+
+  // Find classes by class_number in the fetched data and include them
+  for (const wanted of want) {
+    let cls = null;
+    // find in index by class_number
+    for (const v of idx.values()) {
+      if (v && String(v.class_number || '').toUpperCase() === wanted.toUpperCase()) { cls = v; break; }
+    }
+    if (!cls) {
+      // fetch from API if not found
+      cls = await fetchClassByNumber(wanted);
+      if (cls && (cls.id || cls.id === 0)) idx.set(cls.id, cls);
+    }
+    if (cls && (cls.id || cls.id === 0)) {
+      await addWithDeps(cls.id);
+    }
+  }
+
+  return Array.from(byId.values());
+}
+
 // Fetch minimal course data + their prerequisite classes similar to oldscript
 async function fetchRequiredCourseData(majorId, minor1Id, minor2Id, eilLevel) {
   const courseData = [];
@@ -905,7 +997,8 @@ async function buildConstraintsPayload() {
     preferences = {
       startSemester,
       approach: mode,
-      limitFirstYear: !!limitFirstYear
+  limitFirstYear: !!limitFirstYear,
+  eilLevel
     };
   } else {
     // Credits-based: include credit limits and optional firstYearLimits
@@ -915,7 +1008,8 @@ async function buildConstraintsPayload() {
       fallWinterCredits,
       springCredits,
       approach: mode,
-      limitFirstYear: !!limitFirstYear
+  limitFirstYear: !!limitFirstYear,
+  eilLevel
     };
     if (limitFirstYear) {
       preferences.firstYearLimits = {
@@ -927,7 +1021,8 @@ async function buildConstraintsPayload() {
 
   // Include user-chosen elective class IDs (wizard) if any, for filtering only
   // Only include classes selected in the wizard, plus required prereqs/coreqs.
-  const classes = buildRequiredAndSelectedClasses(courseData, state.chosenElectives);
+  let classes = buildRequiredAndSelectedClasses(courseData, state.chosenElectives);
+  classes = await includeEILLevelClasses(courseData, classes, eilLevel);
 
   return { classes, preferences };
 }

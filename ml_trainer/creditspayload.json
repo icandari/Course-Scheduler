@@ -750,24 +750,6 @@
             "from_course": "major"
         },
         {
-            "id": 34,
-            "class_number": "ENTR 380",
-            "class_name": "Social Impact Entrepreneurship",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "minor"
-        },
-        {
             "id": 41,
             "class_number": "PAIS 250",
             "class_name": "Polynesian Dance and Performance",
@@ -878,14 +860,14 @@
             "from_course": "religion"
         },
         {
-            "id": 723,
-            "class_number": "CS 440",
-            "class_name": "Data Visualization",
+            "id": 17,
+            "class_number": "CS 490R",
+            "class_name": "Advanced Topics in Computer Science",
             "semesters_offered": [
-                "Winter"
+                "Fall"
             ],
             "credits": 3,
-            "is_senior_class": false,
+            "is_senior_class": true,
             "restrictions": "",
             "prerequisites": [
                 12
@@ -912,6 +894,42 @@
             "days_offered": [],
             "times_offered": [],
             "from_course": "major"
+        },
+        {
+            "id": 62,
+            "class_number": "EIL 201",
+            "class_name": "The Int'l Student in the University",
+            "semesters_offered": [
+                "Fall",
+                "Winter",
+                "Spring"
+            ],
+            "credits": 2,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "EIL"
+        },
+        {
+            "id": 65,
+            "class_number": "EIL 320",
+            "class_name": "Academic English II",
+            "semesters_offered": [
+                "Fall",
+                "Winter",
+                "Spring"
+            ],
+            "credits": 4,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "EIL"
         }
     ],
     "preferences": {
@@ -921,6 +939,7 @@
         "springCredits": 10,
         "approach": "credits-based",
         "limitFirstYear": true,
+        "eilLevel": "EIL Level 2",
         "firstYearLimits": {
             "fallWinterCredits": 15,
             "springCredits": 10
