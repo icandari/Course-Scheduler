@@ -1,0 +1,385 @@
+{
+    "classes": [
+        {
+            "id": 70,
+            "class_number": "CHEM 101",
+            "class_name": "Introduction to General Chemistry",
+            "semesters_offered": [
+                "Fall",
+                "Winter"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [],
+            "corequisites": [
+                71
+            ],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 71,
+            "class_number": "CHEM 101L",
+            "class_name": "Introduction to Chemistry Lab",
+            "semesters_offered": [
+                "Fall",
+                "Winter"
+            ],
+            "credits": 1,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [],
+            "corequisites": [
+                70
+            ],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 34,
+            "class_number": "ENTR 380",
+            "class_name": "Social Impact Entrepreneurship",
+            "semesters_offered": [
+                "Fall",
+                "Winter",
+                "Spring"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Entrepreneurship"
+        },
+        {
+            "id": 40,
+            "class_number": "PAIS 220",
+            "class_name": "Pacific Social Development",
+            "semesters_offered": [
+                "Fall",
+                "Winter"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [
+                37
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Pacific Studies"
+        },
+        {
+            "id": 37,
+            "class_number": "PAIS 105",
+            "class_name": "Introduction to Pacific Studies",
+            "semesters_offered": [
+                "Fall",
+                "Winter",
+                "Spring"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Pacific Studies"
+        },
+        {
+            "id": 41,
+            "class_number": "PAIS 250",
+            "class_name": "Polynesian Dance and Performance",
+            "semesters_offered": [
+                "Fall",
+                "Winter",
+                "Spring"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Pacific Studies"
+        },
+        {
+            "id": 44,
+            "class_number": "PAIS 330",
+            "class_name": "Sovereignty and Self Governance in Oceania",
+            "semesters_offered": [
+                "Fall",
+                "Winter"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [
+                37
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Pacific Studies"
+        },
+        {
+            "id": 51,
+            "class_number": "REL 261",
+            "class_name": "Family History (Genealogy)",
+            "semesters_offered": [
+                "Fall",
+                "Winter",
+                "Spring"
+            ],
+            "credits": 2,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Religion"
+        },
+        {
+            "id": 52,
+            "class_number": "REL 333",
+            "class_name": "Teachings of the Living Prophets",
+            "semesters_offered": [
+                "Fall",
+                "Winter",
+                "Spring"
+            ],
+            "credits": 2,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Religion"
+        },
+        {
+            "id": 56,
+            "class_number": "REL 122",
+            "class_name": "Book of Mormon II",
+            "semesters_offered": [
+                "Fall",
+                "Winter",
+                "Spring"
+            ],
+            "credits": 2,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Religion"
+        },
+        {
+            "id": 723,
+            "class_number": "CS 440",
+            "class_name": "Data Visualization",
+            "semesters_offered": [
+                "Winter"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [
+                12
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 12,
+            "class_number": "CS 301",
+            "class_name": "Algorithms and Complexity",
+            "semesters_offered": [
+                "Winter"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [
+                9,
+                11
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 11,
+            "class_number": "CS 300",
+            "class_name": "Advanced Object-Oriented Programming",
+            "semesters_offered": [
+                "Fall",
+                "Winter"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [
+                4
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 4,
+            "class_number": "CS 202",
+            "class_name": "Introduction to Object-Oriented Programming",
+            "semesters_offered": [
+                "Fall",
+                "Winter",
+                "Spring"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [
+                1
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 1,
+            "class_number": "CS 101",
+            "class_name": "Introduction to Programming Fundamentals",
+            "semesters_offered": [
+                "Fall"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 9,
+            "class_number": "CS 206",
+            "class_name": "Discrete Mathematics II",
+            "semesters_offered": [
+                "Winter",
+                "Spring"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [
+                4,
+                8
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 8,
+            "class_number": "CS 205",
+            "class_name": "Foundations of Discrete Mathematics",
+            "semesters_offered": [
+                "Fall",
+                "Winter"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [
+                1
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 724,
+            "class_number": "CS 404",
+            "class_name": "Advanced Web Applications",
+            "semesters_offered": [
+                "Spring"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [
+                14
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 14,
+            "class_number": "CS 401",
+            "class_name": "Web Applications Development",
+            "semesters_offered": [
+                "Fall"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [
+                5,
+                11
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 5,
+            "class_number": "CS 250",
+            "class_name": "Database Applications",
+            "semesters_offered": [
+                "Fall",
+                "Winter"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        }
+    ],
+    "preferences": {
+        "startSemester": "Winter 2025",
+        "majorClassLimit": 4,
+        "fallWinterCredits": 16,
+        "springCredits": 10,
+        "approach": "credits-based",
+        "limitFirstYear": true,
+        "firstYearLimits": {
+            "fallWinterCredits": 15,
+            "springCredits": 10
+        }
+    }
+}

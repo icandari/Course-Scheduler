@@ -828,19 +828,31 @@ async function buildConstraintsPayload() {
   const firstYearFW = parseInt(document.getElementById('max-fw-y1')?.value || String(fallWinterCredits), 10);
   const firstYearSP = parseInt(document.getElementById('max-spring-y1')?.value || String(springCredits), 10);
 
-  const preferences = {
-    startSemester,
-    majorClassLimit,
-    fallWinterCredits,
-    springCredits,
-  approach: (loadMode() === 'semester' ? 'semester-based' : 'credits-based')
-  };
-  if (limitFirstYear) {
-    preferences.limitFirstYear = true;
-    preferences.firstYearLimits = {
-      fallWinterCredits: firstYearFW,
-      springCredits: firstYearSP
+  const mode = loadMode() === 'semester' ? 'semester-based' : 'credits-based';
+  let preferences;
+  if (mode === 'semester-based') {
+    // Semester-based: only include startSemester, approach, and limitFirstYear boolean
+    preferences = {
+      startSemester,
+      approach: mode,
+      limitFirstYear: !!limitFirstYear
     };
+  } else {
+    // Credits-based: include credit limits and optional firstYearLimits
+    preferences = {
+      startSemester,
+      majorClassLimit,
+      fallWinterCredits,
+      springCredits,
+      approach: mode,
+      limitFirstYear: !!limitFirstYear
+    };
+    if (limitFirstYear) {
+      preferences.firstYearLimits = {
+        fallWinterCredits: firstYearFW,
+        springCredits: firstYearSP
+      };
+    }
   }
 
   // Include user-chosen elective class IDs (wizard) if any, for filtering only

@@ -1,40 +1,38 @@
 {
     "classes": [
         {
-            "id": 72,
-            "class_number": "BIOL 112",
-            "class_name": "Biology I - Cell and Molecular Biology",
+            "id": 70,
+            "class_number": "CHEM 101",
+            "class_name": "Introduction to General Chemistry",
             "semesters_offered": [
                 "Fall",
-                "Winter",
-                "Spring"
+                "Winter"
             ],
             "credits": 3,
             "is_senior_class": false,
-            "restrictions": null,
+            "restrictions": "",
             "prerequisites": [],
             "corequisites": [
-                73
+                71
             ],
             "days_offered": [],
             "times_offered": [],
             "from_course": "Computer Science"
         },
         {
-            "id": 73,
-            "class_number": "BIOL 112L",
-            "class_name": "Biology I - Cell and Molecular Biology Lab",
+            "id": 71,
+            "class_number": "CHEM 101L",
+            "class_name": "Introduction to Chemistry Lab",
             "semesters_offered": [
                 "Fall",
-                "Winter",
-                "Spring"
+                "Winter"
             ],
             "credits": 1,
             "is_senior_class": false,
-            "restrictions": null,
+            "restrictions": "",
             "prerequisites": [],
             "corequisites": [
-                72
+                70
             ],
             "days_offered": [],
             "times_offered": [],
@@ -187,17 +185,17 @@
             "from_course": "Religion"
         },
         {
-            "id": 724,
-            "class_number": "CS 404",
-            "class_name": "Advanced Web Applications",
+            "id": 723,
+            "class_number": "CS 440",
+            "class_name": "Data Visualization",
             "semesters_offered": [
-                "Spring"
+                "Winter"
             ],
             "credits": 3,
             "is_senior_class": false,
             "restrictions": "",
             "prerequisites": [
-                14
+                12
             ],
             "corequisites": [],
             "days_offered": [],
@@ -205,17 +203,17 @@
             "from_course": "Computer Science"
         },
         {
-            "id": 14,
-            "class_number": "CS 401",
-            "class_name": "Web Applications Development",
+            "id": 12,
+            "class_number": "CS 301",
+            "class_name": "Algorithms and Complexity",
             "semesters_offered": [
-                "Fall"
+                "Winter"
             ],
             "credits": 3,
             "is_senior_class": false,
             "restrictions": "",
             "prerequisites": [
-                5,
+                9,
                 11
             ],
             "corequisites": [],
@@ -279,60 +277,6 @@
             "from_course": "Computer Science"
         },
         {
-            "id": 5,
-            "class_number": "CS 250",
-            "class_name": "Database Applications",
-            "semesters_offered": [
-                "Fall",
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "Computer Science"
-        },
-        {
-            "id": 725,
-            "class_number": "CS 460",
-            "class_name": "Video Game Development",
-            "semesters_offered": [
-                "Fall"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                12
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "Computer Science"
-        },
-        {
-            "id": 12,
-            "class_number": "CS 301",
-            "class_name": "Algorithms and Complexity",
-            "semesters_offered": [
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                9,
-                11
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "Computer Science"
-        },
-        {
             "id": 9,
             "class_number": "CS 206",
             "class_name": "Discrete Mathematics II",
@@ -370,18 +314,65 @@
             "days_offered": [],
             "times_offered": [],
             "from_course": "Computer Science"
+        },
+        {
+            "id": 724,
+            "class_number": "CS 404",
+            "class_name": "Advanced Web Applications",
+            "semesters_offered": [
+                "Spring"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [
+                14
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 14,
+            "class_number": "CS 401",
+            "class_name": "Web Applications Development",
+            "semesters_offered": [
+                "Fall"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [
+                5,
+                11
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
+        },
+        {
+            "id": 5,
+            "class_number": "CS 250",
+            "class_name": "Database Applications",
+            "semesters_offered": [
+                "Fall",
+                "Winter"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": null,
+            "prerequisites": [],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "Computer Science"
         }
     ],
     "preferences": {
         "startSemester": "Winter 2025",
-        "majorClassLimit": 4,
-        "fallWinterCredits": 16,
-        "springCredits": 10,
-        "approach": "credits-based",
-        "limitFirstYear": true,
-        "firstYearLimits": {
-            "fallWinterCredits": 15,
-            "springCredits": 10
-        }
+        "approach": "semester-based",
+        "limitFirstYear": false
     }
 }
