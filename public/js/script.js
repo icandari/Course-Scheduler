@@ -598,10 +598,15 @@ function normalizeIdArray(arr) {
 
 function resolveFromCourseLabel(course) {
   const type = (course?.course_type || '').toLowerCase();
-  if (type.includes('religion')) return 'Religion';
+  if (type.includes('religion')) return 'religion';
   if (type.includes('eil')) return 'EIL';
-  // Major/Minor: use the course name
-  return course?.course_name || 'Course';
+  if (type.includes('major')) return 'major';
+  if (type.includes('minor')) return 'minor';
+  // Fallback: try to infer from name, else default to 'major'
+  const name = (course?.course_name || '').toUpperCase();
+  if (name.startsWith('REL ')) return 'religion';
+  if (name.includes('EIL') || name.includes('STDEV 100R')) return 'EIL';
+  return 'major';
 }
 
 function flattenCourseDataToClasses(courseData, selectedElectiveIds) {
@@ -609,7 +614,7 @@ function flattenCourseDataToClasses(courseData, selectedElectiveIds) {
   const seen = new Set();
   const sel = new Set(selectedElectiveIds || []);
   (courseData || []).forEach(course => {
-    const fromCourse = (course && course.id === 'additional') ? 'Prereq/Coreq' : resolveFromCourseLabel(course);
+  const fromCourse = (course && course.id === 'additional') ? 'major' : resolveFromCourseLabel(course);
     const sections = Array.isArray(course?.sections) ? course.sections : [];
     sections.forEach(sec => {
       const isElectiveSection = (sec?.is_required === false) && ((sec?.credits_needed_to_take || 0) > 0);
@@ -695,6 +700,71 @@ function buildSelectedElectivesClasses(courseData, chosenElectives) {
   };
 
   // Iterate selected electives by section to derive from_course
+  Object.entries(chosenElectives || {}).forEach(([sectionId, set]) => {
+    const parentCourse = sectionToCourse.get(isNaN(sectionId) ? sectionId : Number(sectionId));
+    const fromCourseLabel = resolveFromCourseLabel(parentCourse);
+    const ids = Array.from(set || []);
+    ids.forEach(id => addWithDeps(id, fromCourseLabel));
+  });
+
+  return Array.from(outMap.values());
+}
+
+// Build classes list including:
+// - All required classes from selected courses (major/minors/religion/EIL), and
+// - User-selected electives with their prereq/coreq closure.
+// Dependencies inherit the from_course of the seed (required/elective) that pulled them in.
+function buildRequiredAndSelectedClasses(courseData, chosenElectives) {
+  const sectionToCourse = buildSectionToCourseMap(courseData);
+  const idx = buildClassIndex(courseData);
+  const outMap = new Map(); // id -> class payload
+
+  const toPayload = (cls, fromCourseLabel) => ({
+    id: cls.id,
+    class_number: cls.class_number || '',
+    class_name: cls.class_name || '',
+    semesters_offered: Array.isArray(cls.semesters_offered) ? cls.semesters_offered : [],
+    credits: Number(cls.credits) || 0,
+    is_senior_class: !!cls.is_senior_class,
+    restrictions: cls.restrictions ?? null,
+    prerequisites: normalizeIdArray(cls.prerequisites),
+    corequisites: normalizeIdArray(cls.corequisites),
+    days_offered: Array.isArray(cls.days_offered) ? cls.days_offered : [],
+    times_offered: Array.isArray(cls.times_offered) ? cls.times_offered : [],
+    from_course: fromCourseLabel
+  });
+
+  const addWithDeps = (startId, fromCourseLabel) => {
+    const stack = [startId];
+    const visited = new Set();
+    while (stack.length) {
+      const id = stack.pop();
+      if (visited.has(id)) continue;
+      visited.add(id);
+      const cls = idx.get(id);
+      if (!cls) continue;
+      if (!outMap.has(id)) outMap.set(id, toPayload(cls, fromCourseLabel));
+      const prereqs = normalizeIdArray(cls.prerequisites);
+      const coreqs = normalizeIdArray(cls.corequisites);
+      [...prereqs, ...coreqs].forEach(depId => {
+        if (depId != null && !visited.has(depId)) stack.push(depId);
+      });
+    }
+  };
+
+  // 1) Seed with ALL required classes from selected courses
+  (courseData || []).forEach(course => {
+    const fromCourseLabel = resolveFromCourseLabel(course);
+    (course.sections || []).forEach(sec => {
+      const isElectiveSection = (sec?.is_required === false) && ((sec?.credits_needed_to_take || 0) > 0);
+      if (isElectiveSection) return; // skip electives here; handled below
+      (sec.classes || []).forEach(cls => {
+        if (cls && (cls.id || cls.id === 0)) addWithDeps(cls.id, fromCourseLabel);
+      });
+    });
+  });
+
+  // 2) Add user-selected electives and their dependency closure, per section
   Object.entries(chosenElectives || {}).forEach(([sectionId, set]) => {
     const parentCourse = sectionToCourse.get(isNaN(sectionId) ? sectionId : Number(sectionId));
     const fromCourseLabel = resolveFromCourseLabel(parentCourse);
@@ -857,7 +927,7 @@ async function buildConstraintsPayload() {
 
   // Include user-chosen elective class IDs (wizard) if any, for filtering only
   // Only include classes selected in the wizard, plus required prereqs/coreqs.
-  const classes = buildSelectedElectivesClasses(courseData, state.chosenElectives);
+  const classes = buildRequiredAndSelectedClasses(courseData, state.chosenElectives);
 
   return { classes, preferences };
 }
