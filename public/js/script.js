@@ -48,6 +48,62 @@ function saveStepToStorage(step) {
 function loadStepFromStorage() {
   try { return localStorage.getItem(STORAGE_KEYS.step) || 'holokai'; } catch { return 'holokai'; }
 }
+// Planner mode: 'credits' (default) | 'semester'
+const MODE_KEY = 'holokai:mode';
+function saveMode(mode){ try{ localStorage.setItem(MODE_KEY, mode); }catch{} }
+function loadMode(){ try{ return localStorage.getItem(MODE_KEY) || 'credits'; }catch{ return 'credits'; } }
+
+// --- Mode toggle helpers (top-level so we can use them after mounting constraints UI) ---
+function setModeActive(which){
+  const modeSemester = document.getElementById('mode-semester');
+  const modeCredits = document.getElementById('mode-credits');
+  if (!modeSemester || !modeCredits) return;
+  if (which === 'semester') {
+    modeSemester.classList.add('active'); modeSemester.setAttribute('aria-pressed','true');
+    modeCredits.classList.remove('active'); modeCredits.setAttribute('aria-pressed','false');
+  } else {
+    modeCredits.classList.add('active'); modeCredits.setAttribute('aria-pressed','true');
+    modeSemester.classList.remove('active'); modeSemester.setAttribute('aria-pressed','false');
+  }
+}
+
+function setConstraintsModeUI(which){
+  const showEl = (el, show) => { if (!el) return; el.style.display = show ? '' : 'none'; };
+  const eilField = document.getElementById('eil-level')?.closest('.field');
+  const startField = document.getElementById('start-sem')?.closest('.field');
+  const maxRow = document.getElementById('max-fw')?.closest('.fields-row');
+  const maxMajorField = document.getElementById('max-major')?.closest('.field');
+  const fyToggleField = document.getElementById('limit-year1')?.closest('.field');
+  const fyRow = document.getElementById('max-fw-y1')?.closest('.fields-row');
+  const creditsMode = which !== 'semester';
+  // Always show these
+  showEl(eilField, true);
+  showEl(startField, true);
+  showEl(fyToggleField, true);
+  // Show/hide the rest based on mode
+  showEl(maxRow, creditsMode);
+  showEl(maxMajorField, creditsMode);
+  showEl(fyRow, creditsMode);
+}
+
+function wireModeToggle(){
+  const modeSemester = document.getElementById('mode-semester');
+  const modeCredits = document.getElementById('mode-credits');
+  if (!modeSemester || !modeCredits) return; // Not mounted yet
+  if (modeSemester._wired || modeCredits._wired) {
+    // Still apply UI with current mode in case of re-entry
+    const current = loadMode();
+    setModeActive(current);
+    setConstraintsModeUI(current);
+    return;
+  }
+  const current = loadMode();
+  setModeActive(current);
+  setConstraintsModeUI(current);
+  modeSemester.addEventListener('click', () => { saveMode('semester'); setModeActive('semester'); setConstraintsModeUI('semester'); });
+  modeCredits.addEventListener('click', () => { saveMode('credits'); setModeActive('credits'); setConstraintsModeUI('credits'); });
+  modeSemester._wired = true; modeCredits._wired = true;
+}
 
 // Keep search inputs in sync with current selection (both Holokai step and Constraints re-selectors)
 function syncInputsFromState() {
@@ -271,6 +327,9 @@ function showConstraintsUI() {
   const constraints = document.getElementById('constraints-ui');
   if (constraints) constraints.style.display = 'grid';
 
+  // Wire the mode toggle now that constraints UI is mounted
+  wireModeToggle();
+
   // Mount sidebar dropdowns using existing datasets (only once)
   if (!ddInstances.cMajor && document.getElementById('c-major-input')) {
     ddInstances.cMajor = mountDropdown({
@@ -458,6 +517,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (step === 'constraints') {
       showConstraintsUI();
     } else {
+
+  // If Constraints UI is already visible on load (returning user), wire toggle now
+  wireModeToggle();
       // Make sure first-step Next is visible if we're on Holokai
       const outsideNextWrap = document.querySelector('.actions.actions-outside');
       if (outsideNextWrap) outsideNextWrap.style.display = '';
@@ -652,7 +714,7 @@ async function buildConstraintsPayload() {
     majorClassLimit,
     fallWinterCredits,
     springCredits,
-    approach: 'credits-based'
+  approach: (loadMode() === 'semester' ? 'semester-based' : 'credits-based')
   };
   if (limitFirstYear) {
     preferences.limitFirstYear = true;
@@ -844,6 +906,8 @@ function renderElectivesWizard() {
   if (!canvas) return;
   // While wizard is visible, gray out only the Constraints box (keep Holokai and AI active)
   document.querySelector('.constraints-box')?.classList.add('disabled');
+  // Disable only the inputs/selects inside constraints (leave mode toggle clickable)
+  disableConstraintsControls(true);
 
   // If no elective sections, skip directly to schedule generation UI
   if (!state.electiveSections.length) {
@@ -857,6 +921,7 @@ function renderElectivesWizard() {
     }
   // Re-enable Constraints box
   document.querySelector('.constraints-box')?.classList.remove('disabled');
+  disableConstraintsControls(false);
     return;
   }
 
@@ -1010,9 +1075,22 @@ function renderElectivesWizard() {
         genBtn.onclick = () => generateScheduleFromConstraints();
       }
 
-  // Re-enable Constraints box
+      // Re-enable Constraints box
   document.querySelector('.constraints-box')?.classList.remove('disabled');
+      disableConstraintsControls(false);
     }
+  });
+}
+
+function disableConstraintsControls(disabled){
+  const box = document.querySelector('.constraints-box');
+  if (!box) return;
+  const controls = box.querySelectorAll('select, input[type="checkbox"], input[type="text"], button');
+  controls.forEach(el => {
+    // Keep mode toggle buttons active
+    if (el.id === 'mode-semester' || el.id === 'mode-credits') return;
+    if (el.id === 'export-btn' || el.id === 'next-btn-constraints') return; // sidebar actions handled separately
+    el.disabled = !!disabled;
   });
 }
 

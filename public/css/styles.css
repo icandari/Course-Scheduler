@@ -150,6 +150,9 @@ h1,h2,h3,h4,h5,h6,
 .sidebar-box{ padding:16px; }
 .sidebar-box.small{ --ui-scale: 0.9; --control-scale: 0.8; }
 .sidebar-box .card-title{ margin-top:0; margin-bottom:10px; font-size:16px; }
+.segmented.mode-toggle{ display:inline-flex; border:1px solid var(--border); border-radius:999px; padding:2px; gap:2px; margin-bottom:10px; }
+.segmented.mode-toggle .seg-btn{ background:#fff; border:none; padding:6px 10px; border-radius:999px; cursor:pointer; font-size:12px; color:#374151; }
+.segmented.mode-toggle .seg-btn.active{ background:var(--fg); color:#fff; }
 .sidebar-box .field label{ font-size:12px; margin-bottom:6px; }
 .sidebar-box .sd-input{ height: calc(var(--control-h) * .8); font-size: 13px; padding: 6px 10px; }
 .sidebar-box .sd-list{ max-height: 160px; }
@@ -519,4 +522,4 @@ h1,h2,h3,h4,h5,h6,
 .electives-panel .class-card .dot{ display:none; }
 
 /* Gray-out style for an individual sidebar box when disabled */
-.constraints-sidebar .sidebar-box.disabled{ opacity: .5; pointer-events: none; filter: grayscale(0.15); }
+.constraints-sidebar .sidebar-box.disabled{ opacity: .5; filter: grayscale(0.15); }
