@@ -313,6 +313,28 @@ function refreshAllLists() {
   Object.values(ddInstances).forEach(inst => inst.refresh());
 }
 
+// Toggle back to the Holokai UI
+function showHolokaiUI() {
+  // Persist step
+  saveStepToStorage('holokai');
+  // Hide constraints layout
+  const constraints = document.getElementById('constraints-ui');
+  if (constraints) constraints.style.display = 'none';
+  // Show Holokai step & title
+  const holokaiSec = document.getElementById('step-holokai');
+  if (holokaiSec) {
+    holokaiSec.style.display = '';
+    holokaiSec.closest('section')?.classList.remove('hidden');
+  }
+  const holokaiTitle = document.getElementById('holokai-title');
+  if (holokaiTitle) holokaiTitle.style.display = '';
+  // Show outside Next button again
+  const outsideNextWrap = document.querySelector('.actions.actions-outside');
+  if (outsideNextWrap) outsideNextWrap.style.display = '';
+  // Keep inputs synced
+  syncInputsFromState();
+}
+
 // Toggle to constraints UI and mount its dropdowns (idempotent)
 function showConstraintsUI() {
   // Hide Holokai card & title
@@ -547,6 +569,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Mark step and transition to constraints
         saveStepToStorage('constraints');
         showConstraintsUI();
+      });
+    }
+
+    // Wire Back to Holokai button in the sidebar (if present)
+    const backBtn = document.getElementById('back-to-holokai-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        showHolokaiUI();
       });
     }
 
