@@ -205,7 +205,6 @@ def create_schedule(processed: Dict) -> Dict:
         "metadata": {
             "approach": "semester-based",
             "startSemester": start_semester,
-            "eilLevel": params.get("eilLevel"),
             "generatedAt": datetime.now().isoformat()
         },
         "schedule": scheduled_semesters

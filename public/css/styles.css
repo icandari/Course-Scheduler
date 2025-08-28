@@ -520,6 +520,9 @@ h1,h2,h3,h4,h5,h6,
   #menubar{ display:none !important; }
   /* Show burger button in sidebar */
   .burger-btn{ display:block; }
+  /* Hide preview images for Major/Minor cards on mobile */
+  .preview{ display:block; aspect-ratio:auto; }
+  .preview .pv-img{ display:none; }
 }
 
 /* ===== Electives Wizard (right panel) ===== */

@@ -113,11 +113,6 @@
           <!-- Box 2: Constraints -->
           <div class="sidebar-box card constraints-box small">
             <h3 class="card-title">Constraints</h3>
-            <!-- Planner Mode Toggle -->
-            <div class="segmented mode-toggle" role="group" aria-label="Planner mode">
-              <button id="mode-semester" type="button" class="seg-btn" aria-pressed="false">Semester mode</button>
-              <button id="mode-credits" type="button" class="seg-btn active" aria-pressed="true">Credits mode</button>
-            </div>
             <div class="field">
               <label for="eil-level">EIL Level</label>
               <select id="eil-level" class="select-control">
@@ -138,66 +133,10 @@
               </select>
             </div>
 
-            <div class="fields-row">
-              <div class="field">
-                <label for="max-fw">Max F/W credits</label>
-                <select id="max-fw" class="select-control">
-                  <option>12</option>
-                  <option>13</option>
-                  <option>14</option>
-                  <option>15</option>
-                  <option selected>16</option>
-                  <option>17</option>
-                  <option>18</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="max-spring">Max S credits</label>
-                <select id="max-spring" class="select-control">
-                  <option>9</option>
-                  <option selected>10</option>
-                  <option>11</option>
-                  <option>12</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="max-major">Max Major Classes Per Sem</label>
-              <select id="max-major" class="select-control">
-                <option>2</option>
-                <option>3</option>
-                <option selected>4</option>
-              </select>
-            </div>
 
             <div class="field field-inline">
               <label for="limit-year1">Limit First Year Credits</label>
               <input id="limit-year1" type="checkbox" checked />
-            </div>
-
-            <div class="fields-row">
-              <div class="field">
-                <label for="max-fw-y1">1st Yr Max F/W credits</label>
-                <select id="max-fw-y1" class="select-control">
-                  <option>12</option>
-                  <option>13</option>
-                  <option>14</option>
-                  <option selected>15</option>
-                  <option>16</option>
-                  <option>17</option>
-                  <option>18</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="max-spring-y1">1st Yr Max S credits</label>
-                <select id="max-spring-y1" class="select-control">
-                  <option>9</option>
-                  <option selected>10</option>
-                  <option>11</option>
-                  <option>12</option>
-                </select>
-              </div>
             </div>
             <div class="box-actions">
               <button id="export-btn" class="btn export" type="button">Export</button>

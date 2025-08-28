@@ -16,7 +16,8 @@ const state = {
 // --- Persistence helpers ---
 const STORAGE_KEYS = {
   selected: 'holokai:selected',
-  step: 'holokai:step' // 'holokai' | 'constraints'
+  step: 'holokai:step', // 'holokai' | 'constraints'
+  chosenElectives: 'holokai:chosenElectives'
 };
 
 function saveSelectedToStorage() {
@@ -49,62 +50,47 @@ function saveStepToStorage(step) {
 function loadStepFromStorage() {
   try { return localStorage.getItem(STORAGE_KEYS.step) || 'holokai'; } catch { return 'holokai'; }
 }
-// Planner mode: 'credits' (default) | 'semester'
-const MODE_KEY = 'holokai:mode';
-function saveMode(mode){ try{ localStorage.setItem(MODE_KEY, mode); }catch{} }
-function loadMode(){ try{ return localStorage.getItem(MODE_KEY) || 'credits'; }catch{ return 'credits'; } }
 
-// --- Mode toggle helpers (top-level so we can use them after mounting constraints UI) ---
-function setModeActive(which){
-  const modeSemester = document.getElementById('mode-semester');
-  const modeCredits = document.getElementById('mode-credits');
-  if (!modeSemester || !modeCredits) return;
-  if (which === 'semester') {
-    modeSemester.classList.add('active'); modeSemester.setAttribute('aria-pressed','true');
-    modeCredits.classList.remove('active'); modeCredits.setAttribute('aria-pressed','false');
-  } else {
-    modeCredits.classList.add('active'); modeCredits.setAttribute('aria-pressed','true');
-    modeSemester.classList.remove('active'); modeSemester.setAttribute('aria-pressed','false');
-  }
+// Persist elective selections: sectionId -> [classIds]
+function saveChosenElectivesToStorage(){
+  try {
+    const obj = {};
+    Object.entries(state.chosenElectives || {}).forEach(([secId, set]) => {
+      const arr = Array.from(set || []);
+      if (arr.length) obj[secId] = arr;
+    });
+    localStorage.setItem(STORAGE_KEYS.chosenElectives, JSON.stringify(obj));
+  } catch {}
 }
 
-function setConstraintsModeUI(which){
-  const showEl = (el, show) => { if (!el) return; el.style.display = show ? '' : 'none'; };
-  const eilField = document.getElementById('eil-level')?.closest('.field');
-  const startField = document.getElementById('start-sem')?.closest('.field');
-  const maxRow = document.getElementById('max-fw')?.closest('.fields-row');
-  const maxMajorField = document.getElementById('max-major')?.closest('.field');
-  const fyToggleField = document.getElementById('limit-year1')?.closest('.field');
-  const fyRow = document.getElementById('max-fw-y1')?.closest('.fields-row');
-  const creditsMode = which !== 'semester';
-  // Always show these
-  showEl(eilField, true);
-  showEl(startField, true);
-  showEl(fyToggleField, true);
-  // Show/hide the rest based on mode
-  showEl(maxRow, creditsMode);
-  showEl(maxMajorField, creditsMode);
-  showEl(fyRow, creditsMode);
+function loadChosenElectivesFromStorage(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.chosenElectives);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    const out = {};
+    if (parsed && typeof parsed === 'object') {
+      Object.entries(parsed).forEach(([k, arr]) => {
+        if (Array.isArray(arr)) out[k] = new Set(arr.map(Number).filter(v => !Number.isNaN(v)));
+      });
+    }
+    state.chosenElectives = out;
+  } catch {}
 }
 
-function wireModeToggle(){
-  const modeSemester = document.getElementById('mode-semester');
-  const modeCredits = document.getElementById('mode-credits');
-  if (!modeSemester || !modeCredits) return; // Not mounted yet
-  if (modeSemester._wired || modeCredits._wired) {
-    // Still apply UI with current mode in case of re-entry
-    const current = loadMode();
-    setModeActive(current);
-    setConstraintsModeUI(current);
-    return;
-  }
-  const current = loadMode();
-  setModeActive(current);
-  setConstraintsModeUI(current);
-  modeSemester.addEventListener('click', () => { saveMode('semester'); setModeActive('semester'); setConstraintsModeUI('semester'); });
-  modeCredits.addEventListener('click', () => { saveMode('credits'); setModeActive('credits'); setConstraintsModeUI('credits'); });
-  modeSemester._wired = true; modeCredits._wired = true;
+// Remove persisted selections for sections that no longer exist
+function pruneChosenElectivesToSections(sections){
+  try {
+    const ids = new Set((sections || []).map(s => s && (s.id || s.id === 0) ? String(s.id) : null).filter(Boolean));
+    const next = {};
+    Object.entries(state.chosenElectives || {}).forEach(([secId, set]) => {
+      if (ids.has(String(secId)) && set && set.size) next[secId] = set;
+    });
+    state.chosenElectives = next;
+  } catch {}
 }
+// Credits-only mode: remove toggle; helpers no longer needed
+function wireModeToggle(){ /* no-op (semester mode disabled) */ }
 
 // Keep search inputs in sync with current selection (both Holokai step and Constraints re-selectors)
 function syncInputsFromState() {
@@ -402,12 +388,17 @@ function showConstraintsUI() {
   // Convert sidebar Holokai selectors to display-only (no dropdowns)
   const toDisplayOnly = (ddId, selObj) => {
     const dd = document.getElementById(ddId);
-    if (!dd || dd._displayOnly) return;
-    const name = selObj?.name || '—';
-    const { dot } = holokaiMeta(selObj?.holokai || '');
-    dd.innerHTML = `<div class="sd-display"><span class="dot ${dot}"></span><span class="sd-name">${name}</span></div>`;
-    dd._displayOnly = true;
+  if (!dd) return;
+  const name = selObj?.name || '—';
+  const { dot } = holokaiMeta(selObj?.holokai || '');
+  dd.innerHTML = `<div class="sd-display"><span class="dot ${dot}"></span><span class="sd-name">${name}</span></div>`;
+  dd._displayOnly = true;
   };
+  toDisplayOnly('c-major-dd', state.selected.major);
+  toDisplayOnly('c-minor1-dd', state.selected.minor1);
+  toDisplayOnly('c-minor2-dd', state.selected.minor2);
+
+  // Ensure display reflects any updates if user changed selections
   toDisplayOnly('c-major-dd', state.selected.major);
   toDisplayOnly('c-minor1-dd', state.selected.minor1);
   toDisplayOnly('c-minor2-dd', state.selected.minor2);
@@ -457,6 +448,9 @@ function showConstraintsUI() {
   // Immediately start the electives picker since courses are chosen
   state.scheduleGenerated = false;
   // Do not render electives here; now shown inline on first page
+
+  // If user refreshed on constraints page, restore chosen electives for payload
+  loadChosenElectivesFromStorage();
 
   // Re-render when starting semester changes
   const startSel = document.getElementById('start-sem');
@@ -564,6 +558,24 @@ function renderScheduleCanvas(){
 // Init: fetch basic course list and mount dropdowns
 document.addEventListener('DOMContentLoaded', async () => {
   try {
+  // Restore elective selections early
+  loadChosenElectivesFromStorage();
+    // Inject minimal styles for class popover
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .class-popover { z-index: 1000; max-width: 320px; background: #fff; box-shadow: 0 8px 24px rgba(0,0,0,0.15); border: 1px solid #e6e6e6; border-radius: 8px; padding: 12px; position: fixed; }
+      .class-popover.hidden { display: none; }
+      .class-popover .cp-title { font-weight: 600; margin-bottom: 4px; }
+      .class-popover .cp-credits { color: #666; font-size: 12px; margin-bottom: 8px; }
+      .class-popover .cp-desc { font-size: 13px; margin-bottom: 10px; line-height: 1.35; }
+      .class-popover .cp-sub { font-weight: 600; margin-bottom: 6px; font-size: 13px; }
+      .class-popover .cp-prereqs { margin: 0; padding-left: 16px; }
+      .class-popover .cp-prereqs li { font-size: 13px; margin-bottom: 4px; }
+      .class-popover .cp-none { font-size: 13px; color: #666; }
+      .class-popover .cp-close { position: absolute; right: 6px; top: 4px; border: none; background: transparent; font-size: 18px; line-height: 1; cursor: pointer; color: #888; }
+      .class-popover .cp-close:hover { color: #333; }
+    `;
+    document.head.appendChild(style);
     // Card-level help for Holokai step
     document.querySelector('#step-holokai .card-help')?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -622,27 +634,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   try { await ensureInlineElectives(); } catch {}
     }
 
-    // Wire first-year limit toggle to enable/disable its selects
-    const fyToggle = document.getElementById('limit-year1');
-    const fySelects = [
-      document.getElementById('max-fw-y1'),
-      document.getElementById('max-spring-y1')
-    ];
-    const syncFyEnabled = () => {
-      const enabled = !!fyToggle?.checked;
-      fySelects.forEach(s => { if (s) s.disabled = !enabled; });
-    };
-    if (fyToggle) {
-      fyToggle.addEventListener('change', syncFyEnabled);
-      // Ensure initial state reflects default checked attribute
-      syncFyEnabled();
-    }
+  // First-year limit checkbox remains; no additional selects to toggle anymore
 
     const outsideNext = document.getElementById('next-btn');
     if (outsideNext) {
       outsideNext.addEventListener('click', () => {
         // Mark step and transition to constraints
         saveStepToStorage('constraints');
+    // Reset detailed data so sidebar reflects new choices and wizard rebuilds
+    state.courseDataCache = null;
+    state.electiveSections = [];
+    state.electiveIndex = 0;
+    state.chosenElectives = {};
         showConstraintsUI();
       });
     }
@@ -696,6 +699,39 @@ function showLoadingIndicator() {
 function hideLoadingIndicator() {
   const el = document.getElementById('loading-indicator');
   if (el) el.classList.add('hidden');
+}
+
+// --- Small Popover for class details ---
+function ensureClassPopover(){
+  let el = document.getElementById('class-popover');
+  if (el) return el;
+  el = document.createElement('div');
+  el.id = 'class-popover';
+  el.className = 'class-popover hidden';
+  el.innerHTML = '<button class="cp-close" aria-label="Close">×</button><div class="cp-content"></div>';
+  document.body.appendChild(el);
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!el || el.classList.contains('hidden')) return;
+    if (!el.contains(e.target)) el.classList.add('hidden');
+  });
+  const closeBtn = el.querySelector('.cp-close');
+  if (closeBtn) closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    el.classList.add('hidden');
+  });
+  return el;
+}
+
+function openClassPopover(html, anchorEl){
+  const pop = ensureClassPopover();
+  const content = pop.querySelector('.cp-content');
+  if (content) content.innerHTML = html;
+  const rect = anchorEl.getBoundingClientRect();
+  pop.style.position = 'fixed';
+  pop.style.left = `${Math.min(rect.left, window.innerWidth - 320)}px`;
+  pop.style.top = `${rect.bottom + 6}px`;
+  pop.classList.remove('hidden');
 }
 
 // ---------------------- Payload helpers: flatten to classes ----------------------
@@ -1101,40 +1137,29 @@ async function buildConstraintsPayload() {
 
   // Constraints
   const startSemester = document.getElementById('start-sem')?.value || '';
-  const majorClassLimit = parseInt(document.getElementById('max-major')?.value || '2', 10);
-  const fallWinterCredits = parseInt(document.getElementById('max-fw')?.value || '18', 10);
-  const springCredits = parseInt(document.getElementById('max-spring')?.value || '15', 10);
+  // Fixed credit caps in credits-only mode
+  const majorClassLimit = 4; // keep a sensible default; UI control removed
+  const fallWinterCredits = 18;
+  const springCredits = 12;
   const limitFirstYear = !!document.getElementById('limit-year1')?.checked;
-  const firstYearFW = parseInt(document.getElementById('max-fw-y1')?.value || String(fallWinterCredits), 10);
-  const firstYearSP = parseInt(document.getElementById('max-spring-y1')?.value || String(springCredits), 10);
+  const firstYearFW = 16;
+  const firstYearSP = 10;
 
-  const mode = loadMode() === 'semester' ? 'semester-based' : 'credits-based';
-  let preferences;
-  if (mode === 'semester-based') {
-    // Semester-based: only include startSemester, approach, and limitFirstYear boolean
-    preferences = {
-      startSemester,
-      approach: mode,
-  limitFirstYear: !!limitFirstYear,
-  eilLevel
+  // Credits-based only
+  const preferences = {
+    startSemester,
+    majorClassLimit,
+    fallWinterCredits,
+    springCredits,
+    approach: 'credits-based',
+    limitFirstYear: !!limitFirstYear,
+    eilLevel
+  };
+  if (limitFirstYear) {
+    preferences.firstYearLimits = {
+      fallWinterCredits: firstYearFW,
+      springCredits: firstYearSP
     };
-  } else {
-    // Credits-based: include credit limits and optional firstYearLimits
-    preferences = {
-      startSemester,
-      majorClassLimit,
-      fallWinterCredits,
-      springCredits,
-      approach: mode,
-  limitFirstYear: !!limitFirstYear,
-  eilLevel
-    };
-    if (limitFirstYear) {
-      preferences.firstYearLimits = {
-        fallWinterCredits: firstYearFW,
-        springCredits: firstYearSP
-      };
-    }
   }
 
   // Include user-chosen elective class IDs (wizard) if any, for filtering only
@@ -1148,9 +1173,9 @@ async function buildConstraintsPayload() {
 function computeTotals(schedule) {
   let totalCredits = 0;
   schedule.forEach(sem => {
-    if (typeof sem.totalCredits === 'number') totalCredits += sem.totalCredits;
+    if (typeof sem.totalCredits === 'number') totalCredits += Number(sem.totalCredits) || 0;
     else if (Array.isArray(sem.classes)) {
-      totalCredits += sem.classes.reduce((s, c) => s + (c.credits || 0), 0);
+      totalCredits += sem.classes.reduce((s, c) => s + (Number(c.credits) || 0), 0);
     }
   });
   const totalSemesters = schedule.length;
@@ -1192,7 +1217,7 @@ function renderScheduleInCanvas(schedule) {
 
   const yearSections = chunks.map((terms, idx) => {
     const semCards = terms.map(sem => {
-      const semCredits = typeof sem.totalCredits === 'number' ? sem.totalCredits : (sem.classes || []).reduce((s,c)=>s+(c.credits||0),0);
+      const semCredits = (typeof sem.totalCredits === 'number' ? Number(sem.totalCredits) : (sem.classes || []).reduce((s,c)=>s+(Number(c.credits)||0),0)) || 0;
       const items = (sem.classes || []).map(cls => {
         const dot = mapCourseTypeToDot(cls.course_type);
         const num = cls.class_number || '';
@@ -1200,7 +1225,7 @@ function renderScheduleInCanvas(schedule) {
         const credits = cls.credits || 0;
         return `
           <li class="class-item">
-            <div class="class-card">
+            <div class="class-card class-result" data-class-id="${cls.id || ''}">
               <div class="cc-row1">
                 <span class="dot ${dot}"></span>
                 <span class="class-number">${num}</span>
@@ -1220,7 +1245,10 @@ function renderScheduleInCanvas(schedule) {
         </div>
       `;
     }).join('');
-    const yearCredits = terms.reduce((t,sem)=>t+(typeof sem.totalCredits==='number'?sem.totalCredits:(sem.classes||[]).reduce((s,c)=>s+(c.credits||0),0)),0);
+    const yearCredits = terms.reduce((t,sem)=>{
+      const sc = (typeof sem.totalCredits==='number' ? Number(sem.totalCredits) : (sem.classes||[]).reduce((s,c)=>s+(Number(c.credits)||0),0)) || 0;
+      return t + sc;
+    },0);
     return `
       <section class="year-section">
         <div class="year-header"><div class="year-title">Year ${idx + 1}</div><div class="year-credits">${yearCredits} Credits Taken</div></div>
@@ -1230,6 +1258,57 @@ function renderScheduleInCanvas(schedule) {
   }).join('');
 
   canvas.innerHTML = `${statsHtml}${yearSections}`;
+
+  // Wire popovers for class details
+  const cards = canvas.querySelectorAll('.class-card.class-result');
+  cards.forEach(card => {
+    const id = Number(card.getAttribute('data-class-id'));
+    const handler = async (e) => {
+      // Allow clicking anywhere on the card, including 'i'
+      e.stopPropagation();
+      if (!id && id !== 0) return;
+      try {
+        // Fetch details and prerequisites
+        const detailResp = await fetch(`/api/classes/${id}?fields=essential,description,prerequisites`);
+        if (!detailResp.ok) throw new Error('Failed to load');
+        const d = await detailResp.json();
+        const num = d.class_number || '';
+        const name = d.class_name || '';
+        const credits = Number(d.credits) || 0;
+        const desc = d.description || 'No description available.';
+        const prereqIds = Array.isArray(d.prerequisites) ? d.prerequisites.map(p => (typeof p === 'object' ? p.id : p)).filter(x=>x!=null) : [];
+        let prereqsHtml = '';
+        if (prereqIds.length) {
+          const list = await Promise.all(prereqIds.map(async pid => {
+            try {
+              const r = await fetch(`/api/classes/${pid}?fields=essential`);
+              if (r.ok) {
+                const c = await r.json();
+                return `${c.class_number || ''} ${c.class_name || ''}`.trim();
+              }
+            } catch {}
+            return `Class ${pid}`;
+          }));
+          prereqsHtml = `<ul class="cp-prereqs">${list.map(li => `<li>${li}</li>`).join('')}</ul>`;
+        } else {
+          prereqsHtml = '<div class="cp-none">No prerequisites</div>';
+        }
+        const html = `
+          <div class="cp-title">${num} • ${name}</div>
+          <div class="cp-credits">${credits} credits</div>
+          <div class="cp-desc">${desc}</div>
+          <div class="cp-sub">Prerequisites</div>
+          ${prereqsHtml}
+        `;
+        openClassPopover(html, card);
+      } catch {
+        openClassPopover('<div class="cp-desc">Unable to load class details.</div>', card);
+      }
+    };
+    card.addEventListener('click', handler);
+    const info = card.querySelector('.info-btn');
+    if (info) info.addEventListener('click', handler);
+  });
 }
 
 async function generateScheduleFromConstraints() {
@@ -1432,11 +1511,12 @@ function renderElectivesWizard() {
           return;
         }
       }
-      // Commit the change
+  // Commit the change
       if (set.has(cid)) set.delete(cid); else set.add(cid);
       card.classList.toggle('selected');
       const btn = card.querySelector('.card-check');
       if (btn) btn.setAttribute('aria-pressed', String(set.has(cid)));
+  saveChosenElectivesToStorage();
       updateNextEnabled();
     };
     card.addEventListener('click', (e) => {
@@ -1458,12 +1538,14 @@ function renderElectivesWizard() {
       // Moving back means wizard not complete; ensure Generate is disabled again
       const genBtn = document.getElementById('next-btn-constraints');
       if (genBtn) genBtn.disabled = true;
+  saveChosenElectivesToStorage();
       renderElectivesWizard();
     }
   });
   if (nextBtn) nextBtn.addEventListener('click', () => {
     if (state.electiveIndex < state.electiveSections.length - 1) {
       state.electiveIndex += 1;
+  saveChosenElectivesToStorage();
       renderElectivesWizard();
     } else {
   // Final step: clear the electives list, hide the toolbar, show message, enable sidebar, and enable Generate
@@ -1480,7 +1562,7 @@ function renderElectivesWizard() {
 
       // Enable Generate in the sidebar
       const genBtn = document.getElementById('next-btn-constraints');
-      if (genBtn) {
+  if (genBtn) {
         genBtn.disabled = false;
         genBtn.textContent = 'Generate';
         genBtn.onclick = () => generateScheduleFromConstraints();
@@ -1489,6 +1571,7 @@ function renderElectivesWizard() {
       // Re-enable Constraints box
   document.querySelector('.constraints-box')?.classList.remove('disabled');
       disableConstraintsControls(false);
+  saveChosenElectivesToStorage();
     }
   });
 }
@@ -1498,8 +1581,7 @@ function disableConstraintsControls(disabled){
   if (!box) return;
   const controls = box.querySelectorAll('select, input[type="checkbox"], input[type="text"], button');
   controls.forEach(el => {
-    // Keep mode toggle buttons active
-    if (el.id === 'mode-semester' || el.id === 'mode-credits') return;
+  // No mode toggle buttons anymore
     if (el.id === 'export-btn' || el.id === 'next-btn-constraints') return; // sidebar actions handled separately
     el.disabled = !!disabled;
   });
@@ -1527,9 +1609,11 @@ async function startElectivesFlow() {
   await augmentElectiveCoreqs(state.courseDataCache);
   // Build a global class index for credit lookups including corequisites
   state.classIndex = buildClassIndex(state.courseDataCache);
-    state.electiveSections = findElectiveSections(state.courseDataCache);
-    state.electiveIndex = 0;
-    state.chosenElectives = {}; // reset previous choices
+  state.electiveSections = findElectiveSections(state.courseDataCache);
+  state.electiveIndex = 0;
+  // Load persisted choices and prune to available sections
+  loadChosenElectivesFromStorage();
+  pruneChosenElectivesToSections(state.electiveSections);
 
     // Change sidebar button to act as Generate but disabled until wizard completes
     const genBtn = document.getElementById('next-btn-constraints');
@@ -1539,7 +1623,7 @@ async function startElectivesFlow() {
       genBtn.onclick = () => {};
     }
 
-    renderElectivesWizard();
+  renderElectivesWizard();
   } catch (e) {
     console.error(e);
     alert('Unable to load electives.');
@@ -1561,9 +1645,11 @@ async function startElectivesFlowInline(){
     state.courseDataCache = await fetchRequiredCourseData(majorId, minor1Id, minor2Id, eilLevel);
     await augmentElectiveCoreqs(state.courseDataCache);
     state.classIndex = buildClassIndex(state.courseDataCache);
-    state.electiveSections = findElectiveSections(state.courseDataCache);
-    state.electiveIndex = 0;
-    state.chosenElectives = {};
+  state.electiveSections = findElectiveSections(state.courseDataCache);
+  state.electiveIndex = 0;
+  // Restore saved selections and prune to available sections
+  loadChosenElectivesFromStorage();
+  pruneChosenElectivesToSections(state.electiveSections);
 
   // During inline electives, hide the outside Next button until finished
   const outsideNextWrap = document.querySelector('.actions.actions-outside');
@@ -1672,10 +1758,11 @@ function renderElectivesWizardInline(){
           if (credits > allowed) return;
         }
       }
-      if (set.has(cid)) set.delete(cid); else set.add(cid);
+  if (set.has(cid)) set.delete(cid); else set.add(cid);
       card.classList.toggle('selected');
       const btn = card.querySelector('.card-check');
       if (btn) btn.setAttribute('aria-pressed', String(set.has(cid)));
+  saveChosenElectivesToStorage();
       updateNextEnabled();
     };
     card.addEventListener('click', (e) => { if (e.target && (e.target.classList.contains('info-btn'))) return; toggle(); });
@@ -1690,23 +1777,21 @@ function renderElectivesWizardInline(){
   if (backBtn) backBtn.addEventListener('click', () => {
     if (state.electiveIndex > 0) {
       state.electiveIndex -= 1;
+  saveChosenElectivesToStorage();
       renderElectivesWizardInline();
     }
   });
   if (nextBtn) nextBtn.addEventListener('click', () => {
     if (state.electiveIndex < state.electiveSections.length - 1) {
       state.electiveIndex += 1;
+  saveChosenElectivesToStorage();
       renderElectivesWizardInline();
     } else {
-      state.electivesComplete = true;
-      const panel = inline.querySelector('.electives-panel.inline .elective-classes');
-      if (panel) panel.innerHTML = '<div class="electives-finish">Electives selected. Adjust constraints and generate your schedule.</div>';
-      const toolbar = inline.querySelector('.elective-toolbar');
-      if (toolbar) toolbar.style.display = 'none';
-      if (nextBtn) nextBtn.disabled = true;
-  // Reveal the outside Next button now that electives are complete
-  const outsideNextWrap = document.querySelector('.actions.actions-outside');
-  if (outsideNextWrap) outsideNextWrap.style.display = '';
+  // Finish: persist and jump straight to constraints page
+  state.electivesComplete = true;
+  saveChosenElectivesToStorage();
+  saveStepToStorage('constraints');
+  showConstraintsUI();
     }
   });
 }
