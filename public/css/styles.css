@@ -252,6 +252,8 @@ h1,h2,h3,h4,h5,h6,
 
 /* Placeholder before generation */
 .canvas-placeholder{ padding:22px; text-align:center; color:#6b7280; font-size:15px; }
+.canvas-placeholder.desktop-only{ display:block; border:1px solid var(--border); border-radius:12px; background:#fff; box-shadow: var(--shadow); padding:28px; }
+@media (max-width: 900px){ .canvas-placeholder.desktop-only{ display:none; } }
 
 /* Box action buttons within Constraints */
 .constraints-box .box-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }

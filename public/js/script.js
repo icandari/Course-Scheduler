@@ -390,6 +390,12 @@ function showConstraintsUI() {
     constraints.style.removeProperty('display');
   }
 
+  // If no schedule yet, show a desktop-only placeholder panel in the canvas
+  const canvas = document.querySelector('.constraints-canvas');
+  if (canvas && !state.scheduleGenerated) {
+    canvas.innerHTML = '<div class="canvas-placeholder desktop-only">Generate schedule to see Holokai plan</div>';
+  }
+
   // Wire the mode toggle now that constraints UI is mounted
   wireModeToggle();
 
@@ -1639,10 +1645,12 @@ function renderElectivesWizardInline(){
     }
     const { credits } = computeSectionSelectionCredits(sec, selectedIds);
     if (chooseCount) {
+      // When all classes share the same credit value, gate by count, not credit sum.
       const ok = selectedIds.length >= chooseCount;
       if (nextEl) nextEl.disabled = !ok;
     } else {
-      const allowed = needCredits + 1;
+      // Allow a cushion to account for auto-added corequisites when summing credits.
+      const allowed = needCredits + 6; // generous buffer for potential coreqs
       const ok = credits >= needCredits && credits <= allowed;
       if (nextEl) nextEl.disabled = !ok;
     }
@@ -1655,9 +1663,14 @@ function renderElectivesWizardInline(){
       const nextSelected = new Set(set);
       if (nextSelected.has(cid)) nextSelected.delete(cid); else nextSelected.add(cid);
       if (needCredits) {
-        const { credits } = computeSectionSelectionCredits(sec, Array.from(nextSelected));
-        const allowed = needCredits + 1;
-        if (credits > allowed) return;
+        if (chooseCount) {
+          // Enforce by count when uniform-credit sections are present
+          if (nextSelected.size > chooseCount) return;
+        } else {
+          const { credits } = computeSectionSelectionCredits(sec, Array.from(nextSelected));
+          const allowed = needCredits + 6; // buffer for coreqs
+          if (credits > allowed) return;
+        }
       }
       if (set.has(cid)) set.delete(cid); else set.add(cid);
       card.classList.toggle('selected');
@@ -1697,6 +1710,7 @@ function renderElectivesWizardInline(){
     }
   });
 }
+
 
 // Build a global index of classes by id from all sections and additional classes
 function buildClassIndex(courseData) {
