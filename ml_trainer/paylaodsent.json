@@ -227,7 +227,10 @@
             "id": 722,
             "class_number": "CS 235",
             "class_name": "Data Structures",
-            "semesters_offered": [],
+            "semesters_offered": [
+                "Fall",
+                "Winter"
+            ],
             "credits": 3,
             "is_senior_class": false,
             "restrictions": "",
@@ -672,38 +675,20 @@
             "from_course": "EIL"
         },
         {
-            "id": 71,
-            "class_number": "CHEM 101L",
-            "class_name": "Introduction to Chemistry Lab",
+            "id": 72,
+            "class_number": "BIOL 112",
+            "class_name": "Biology I - Cell and Molecular Biology",
             "semesters_offered": [
                 "Fall",
-                "Winter"
-            ],
-            "credits": 1,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [],
-            "corequisites": [
-                70
-            ],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 70,
-            "class_number": "CHEM 101",
-            "class_name": "Introduction to General Chemistry",
-            "semesters_offered": [
-                "Fall",
-                "Winter"
+                "Winter",
+                "Spring"
             ],
             "credits": 3,
             "is_senior_class": false,
-            "restrictions": "",
+            "restrictions": null,
             "prerequisites": [],
             "corequisites": [
-                71
+                73
             ],
             "days_offered": [],
             "times_offered": [],
@@ -724,26 +709,6 @@
             "prerequisites": [],
             "corequisites": [
                 72
-            ],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
-            "id": 72,
-            "class_number": "BIOL 112",
-            "class_name": "Biology I - Cell and Molecular Biology",
-            "semesters_offered": [
-                "Fall",
-                "Winter",
-                "Spring"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": null,
-            "prerequisites": [],
-            "corequisites": [
-                73
             ],
             "days_offered": [],
             "times_offered": [],
@@ -787,9 +752,9 @@
             "from_course": "minor"
         },
         {
-            "id": 44,
-            "class_number": "PAIS 330",
-            "class_name": "Sovereignty and Self Governance in Oceania",
+            "id": 45,
+            "class_number": "PAIS 340",
+            "class_name": "Anti-Racism and Belonging: Pacific Dialogue",
             "semesters_offered": [
                 "Fall",
                 "Winter"
@@ -806,9 +771,9 @@
             "from_course": "minor"
         },
         {
-            "id": 52,
-            "class_number": "REL 333",
-            "class_name": "Teachings of the Living Prophets",
+            "id": 51,
+            "class_number": "REL 261",
+            "class_name": "Family History (Genealogy)",
             "semesters_offered": [
                 "Fall",
                 "Winter",
@@ -824,9 +789,9 @@
             "from_course": "religion"
         },
         {
-            "id": 51,
-            "class_number": "REL 261",
-            "class_name": "Family History (Genealogy)",
+            "id": 54,
+            "class_number": "REL 342",
+            "class_name": "Latter-day Saint History 1846-1893",
             "semesters_offered": [
                 "Fall",
                 "Winter",
@@ -860,24 +825,6 @@
             "from_course": "religion"
         },
         {
-            "id": 723,
-            "class_number": "CS 440",
-            "class_name": "Data Visualization",
-            "semesters_offered": [
-                "Winter"
-            ],
-            "credits": 3,
-            "is_senior_class": false,
-            "restrictions": "",
-            "prerequisites": [
-                12
-            ],
-            "corequisites": [],
-            "days_offered": [],
-            "times_offered": [],
-            "from_course": "major"
-        },
-        {
             "id": 724,
             "class_number": "CS 404",
             "class_name": "Advanced Web Applications",
@@ -894,19 +841,33 @@
             "days_offered": [],
             "times_offered": [],
             "from_course": "major"
+        },
+        {
+            "id": 723,
+            "class_number": "CS 440",
+            "class_name": "Data Visualization",
+            "semesters_offered": [
+                "Winter"
+            ],
+            "credits": 3,
+            "is_senior_class": false,
+            "restrictions": "",
+            "prerequisites": [
+                12
+            ],
+            "corequisites": [],
+            "days_offered": [],
+            "times_offered": [],
+            "from_course": "major"
         }
     ],
     "preferences": {
-        "startSemester": "Winter 2025",
+        "startSemester": "Fall 2025",
         "majorClassLimit": 4,
-        "fallWinterCredits": 16,
-        "springCredits": 10,
+        "fallWinterCredits": 18,
+        "springCredits": 12,
         "approach": "credits-based",
-        "limitFirstYear": true,
-        "eilLevel": "Fluent",
-        "firstYearLimits": {
-            "fallWinterCredits": 15,
-            "springCredits": 10
-        }
+        "limitFirstYear": false,
+        "eilLevel": "Fluent"
     }
 }

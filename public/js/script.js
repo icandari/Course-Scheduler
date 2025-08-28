@@ -150,6 +150,25 @@ function mountDropdown({ inputEl, listEl, options, type }) {
       item.addEventListener('click', () => {
         if (item.classList.contains('disabled')) return;
         state.selected[type] = { id: opt.id, name: opt.course_name, holokai: opt.holokai };
+
+        // If changing the Major, and it matches a selected Minor's Holokai type, auto-clear one minor
+        if (type === 'major') {
+          const newH = opt.holokai;
+          let cleared = null;
+          if (state.selected.minor1 && state.selected.minor1.holokai === newH) {
+            state.selected.minor1 = null;
+            cleared = 'minor1';
+          } else if (state.selected.minor2 && state.selected.minor2.holokai === newH) {
+            state.selected.minor2 = null;
+            cleared = 'minor2';
+          }
+          if (cleared) {
+            const ids = cleared === 'minor1' ? ['minor1-input', 'c-minor1-input'] : ['minor2-input', 'c-minor2-input'];
+            ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            updatePreview(cleared);
+          }
+        }
+
         // Show the selected value in all relevant search bars per new requirement
         syncInputsFromState();
         saveSelectedToStorage();
@@ -560,6 +579,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
   // Restore elective selections early
   loadChosenElectivesFromStorage();
+  // Remove any stale loading indicator element from prior runs
+  try { document.getElementById('loading-indicator')?.remove(); } catch {}
     // Inject minimal styles for class popover
     const style = document.createElement('style');
     style.innerHTML = `
@@ -684,21 +705,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Loading indicator helpers (minimal styling assumed)
 function showLoadingIndicator() {
-  let el = document.getElementById('loading-indicator');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'loading-indicator';
-    el.className = 'loading-indicator';
-    el.innerHTML = '<div class="spinner"></div><p>Generating your schedule...</p>';
-    document.body.appendChild(el);
-  } else {
-    el.classList.remove('hidden');
-  }
+  // Disabled: no loading UI per request
 }
 
 function hideLoadingIndicator() {
+  // Ensure any existing indicator is removed
   const el = document.getElementById('loading-indicator');
-  if (el) el.classList.add('hidden');
+  if (el && el.parentNode) el.parentNode.removeChild(el);
 }
 
 // --- Small Popover for class details ---

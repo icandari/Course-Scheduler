@@ -1,0 +1,46 @@
+{
+    "event": "call-ended",
+    "call": {
+        "call_type": "phone",
+        "call_direction": "outbound",
+        "from_number": "+1234567890",
+        "to_number": "+1234567890",
+        "call_duration": 120,
+        "call_start_time": "1972-01-01T00:00:00Z",
+        "call_end_time": "1972-01-01T00:00:00Z",
+        "call_status": "completed",
+        "metadata": {},
+        "extracted_variables": {
+            "name": "Susan",
+            "email": "susan@example.com",
+            "phone": "+1234567890",
+            "company": "Example Inc.",
+            "title": "VP of Sales"
+        },
+        "disconnect_reason": "user_hangup",
+        "transcript": "...",
+        "transcript_object": [ ],
+        "transcript_with_tool_calls": [  ],
+        "meeting_event": {
+            "id": 123,
+            "name": "...",
+            "agent_name": "...",
+            "date": "1972-01-01",
+            "duration_minutes": 120,
+            "lead_time_minutes": 10
+        },
+        "opt_out_sensitive_data": false,
+        "call_analysis": {
+            "call_summary": "...",
+            "in_voicemail": false,
+            "user_sentiment": "...",
+            "call_successful": true,
+            "custom_analysis_data": {
+                "failed_qualified_question": ""
+                
+                
+
+            }
+        }
+    }
+}
