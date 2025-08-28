@@ -9,7 +9,8 @@ const state = {
   electiveSections: [],             // flattened list of elective sections to complete
   electiveIndex: 0,                 // current wizard index
   chosenElectives: {},              // sectionId -> Set(classId)
-  classIndex: null                  // Map of classId -> class object (for prereq/coreq credit lookups)
+  classIndex: null,                 // Map of classId -> class object (for prereq/coreq credit lookups)
+  electivesComplete: false          // whether user finished the electives wizard
 };
 
 // --- Persistence helpers ---
@@ -169,12 +170,10 @@ function mountDropdown({ inputEl, listEl, options, type }) {
         close();
         updatePreview(type);
         updateNextButton();
-        // Re-render lists for other dropdowns to reflect incompatibilities
-        refreshAllLists();
-        // If we're on the constraints screen, reset and re-run electives wizard immediately
-        if (isConstraintsVisible()) {
-          resetAndStartElectivesFlow();
-        }
+  // Re-render lists for other dropdowns to reflect incompatibilities
+  refreshAllLists();
+  // Show inline electives as soon as three choices are valid
+  if (!isConstraintsVisible()) ensureInlineElectives();
       });
 
       listEl.appendChild(item);
@@ -280,10 +279,8 @@ function updatePreview(which) {
       updatePreview(which);
       updateNextButton();
       refreshAllLists();
-      // If constraints are visible, reset the electives picker flow
-      if (isConstraintsVisible()) {
-        resetAndStartElectivesFlow();
-      }
+  // Update inline electives when clearing a choice
+  if (!isConstraintsVisible()) ensureInlineElectives();
     });
   }
 
@@ -313,6 +310,36 @@ function refreshAllLists() {
   Object.values(ddInstances).forEach(inst => inst.refresh());
 }
 
+// --- Inline electives (first page) ---
+function resetElectivesState(){
+  state.courseDataCache = null;
+  state.electiveSections = [];
+  state.electiveIndex = 0;
+  state.chosenElectives = {};
+  state.classIndex = null;
+  state.electivesComplete = false;
+}
+
+function hasCompleteDistinctHolokai(){
+  const s = state.selected;
+  const allPicked = s.major && s.minor1 && s.minor2;
+  const uniq = new Set([s.major?.holokai, s.minor1?.holokai, s.minor2?.holokai]).size === 3;
+  return allPicked && uniq;
+}
+
+async function ensureInlineElectives(){
+  const inline = document.getElementById('electives-inline');
+  if (!inline) return;
+  if (!hasCompleteDistinctHolokai()){
+    inline.style.display = 'none';
+    inline.innerHTML = '';
+    return;
+  }
+  inline.style.display = '';
+  resetElectivesState();
+  await startElectivesFlowInline();
+}
+
 // Toggle back to the Holokai UI
 function showHolokaiUI() {
   // Persist step
@@ -330,9 +357,14 @@ function showHolokaiUI() {
   if (holokaiTitle) holokaiTitle.style.display = '';
   // Show outside Next button again
   const outsideNextWrap = document.querySelector('.actions.actions-outside');
-  if (outsideNextWrap) outsideNextWrap.style.display = '';
+  if (outsideNextWrap) {
+    // If electives are not complete, keep this hidden until user finishes inline wizard
+    outsideNextWrap.style.display = state.electivesComplete ? '' : 'none';
+  }
   // Keep inputs synced
   syncInputsFromState();
+  // Ensure inline electives render if choices are complete
+  ensureInlineElectives();
 }
 
 // Toggle to constraints UI and mount its dropdowns (idempotent)
@@ -345,15 +377,50 @@ function showConstraintsUI() {
   const outsideNextWrap = document.querySelector('.actions.actions-outside');
   if (outsideNextWrap) outsideNextWrap.style.display = 'none';
 
+  // Ensure the inline electives section never appears on the constraints page
+  const inlineElectives = document.getElementById('electives-inline');
+  if (inlineElectives) {
+    inlineElectives.style.display = 'none';
+  }
+
   // Show constraints layout
   const constraints = document.getElementById('constraints-ui');
-  if (constraints) constraints.style.display = 'grid';
+  if (constraints) {
+    // Remove any inline display so CSS (grid on desktop, flex/column on mobile) takes over
+    constraints.style.removeProperty('display');
+  }
 
   // Wire the mode toggle now that constraints UI is mounted
   wireModeToggle();
 
-  // Mount sidebar dropdowns using existing datasets (only once)
-  if (!ddInstances.cMajor && document.getElementById('c-major-input')) {
+  // Convert sidebar Holokai selectors to display-only (no dropdowns)
+  const toDisplayOnly = (ddId, selObj) => {
+    const dd = document.getElementById(ddId);
+    if (!dd || dd._displayOnly) return;
+    const name = selObj?.name || '—';
+    const { dot } = holokaiMeta(selObj?.holokai || '');
+    dd.innerHTML = `<div class="sd-display"><span class="dot ${dot}"></span><span class="sd-name">${name}</span></div>`;
+    dd._displayOnly = true;
+  };
+  toDisplayOnly('c-major-dd', state.selected.major);
+  toDisplayOnly('c-minor1-dd', state.selected.minor1);
+  toDisplayOnly('c-minor2-dd', state.selected.minor2);
+
+  // Always enable and wire the Generate button on the constraints page
+  const genBtn = document.getElementById('next-btn-constraints');
+  if (genBtn) {
+    genBtn.disabled = false;
+    genBtn.textContent = 'Generate';
+    if (!genBtn._wiredStatic) {
+      genBtn.addEventListener('click', () => {
+        generateScheduleFromConstraints();
+      });
+      genBtn._wiredStatic = true;
+    }
+  }
+
+  // Do not mount dropdowns for sidebar selectors anymore (display-only). Leaving code for potential future toggle.
+  /* if (!ddInstances.cMajor && document.getElementById('c-major-input')) {
     ddInstances.cMajor = mountDropdown({
       inputEl: document.getElementById('c-major-input'),
       listEl: document.getElementById('c-major-list'),
@@ -361,14 +428,14 @@ function showConstraintsUI() {
       type: 'major'
     });
   }
-  if (!ddInstances.cMinor1 && document.getElementById('c-minor1-input')) {
+  if (!ddInstances.cMinor2 && document.getElementById('c-minor2-input')) {   
     ddInstances.cMinor1 = mountDropdown({
       inputEl: document.getElementById('c-minor1-input'),
       listEl: document.getElementById('c-minor1-list'),
       options: state.datasets.minors,
       type: 'minor1'
     });
-  }
+  } */
   if (!ddInstances.cMinor2 && document.getElementById('c-minor2-input')) {   
     ddInstances.cMinor2 = mountDropdown({
       inputEl: document.getElementById('c-minor2-input'),
@@ -383,7 +450,7 @@ function showConstraintsUI() {
 
   // Immediately start the electives picker since courses are chosen
   state.scheduleGenerated = false;
-  resetAndStartElectivesFlow();
+  // Do not render electives here; now shown inline on first page
 
   // Re-render when starting semester changes
   const startSel = document.getElementById('start-sem');
@@ -545,6 +612,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Make sure first-step Next is visible if we're on Holokai
       const outsideNextWrap = document.querySelector('.actions.actions-outside');
       if (outsideNextWrap) outsideNextWrap.style.display = '';
+  // Render inline electives if three valid choices are present
+  try { await ensureInlineElectives(); } catch {}
     }
 
     // Wire first-year limit toggle to enable/disable its selects
@@ -580,7 +649,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-  // Do not wire a static handler for Generate here; startElectivesFlow manages it
+  // Ensure Generate works even if the electives wizard never runs on this page
+  const genBtnStatic = document.getElementById('next-btn-constraints');
+  if (genBtnStatic && !genBtnStatic._wiredStatic) {
+    genBtnStatic.addEventListener('click', () => {
+      generateScheduleFromConstraints();
+    });
+    genBtnStatic._wiredStatic = true;
+  }
 
     // Hook up export button when constraints UI present
     const exportBtn = document.getElementById('export-btn');
@@ -1462,6 +1538,164 @@ async function startElectivesFlow() {
     console.error(e);
     alert('Unable to load electives.');
   }
+}
+
+// Inline electives flow
+async function startElectivesFlowInline(){
+  try {
+    const majorId = state.selected.major?.id || null;
+    const minor1Id = state.selected.minor1?.id || null;
+    const minor2Id = state.selected.minor2?.id || null;
+    if (!majorId || !minor1Id || !minor2Id) return;
+    const eilSel = document.getElementById('eil-level');
+    const eilLevel = eilSel ? eilSel.value : 'none';
+    const inline = document.getElementById('electives-inline');
+    if (inline) inline.innerHTML = '<div class="canvas-placeholder">Loading electives…</div>';
+
+    state.courseDataCache = await fetchRequiredCourseData(majorId, minor1Id, minor2Id, eilLevel);
+    await augmentElectiveCoreqs(state.courseDataCache);
+    state.classIndex = buildClassIndex(state.courseDataCache);
+    state.electiveSections = findElectiveSections(state.courseDataCache);
+    state.electiveIndex = 0;
+    state.chosenElectives = {};
+
+  // During inline electives, hide the outside Next button until finished
+  const outsideNextWrap = document.querySelector('.actions.actions-outside');
+  if (outsideNextWrap) outsideNextWrap.style.display = 'none';
+  renderElectivesWizardInline();
+  } catch (e) {
+    console.error(e);
+    const inline = document.getElementById('electives-inline');
+    if (inline) inline.innerHTML = '<div class="canvas-placeholder">Unable to load electives.</div>';
+  }
+}
+
+function renderElectivesWizardInline(){
+  const inline = document.getElementById('electives-inline');
+  if (!inline) return;
+  if (!state.electiveSections.length){
+    inline.innerHTML = '<div class="canvas-placeholder">No electives to choose.</div>';
+    state.electivesComplete = true;
+    return;
+  }
+  const idx = Math.max(0, Math.min(state.electiveIndex, state.electiveSections.length - 1));
+  const sec = state.electiveSections[idx];
+  const classes = sec.classes || [];
+  const needCredits = Number(sec.credits_needed_to_take) || 0;
+  const uniform = uniformClassCredits(classes);
+  const chooseCount = uniform && needCredits % uniform === 0 ? Math.round(needCredits / uniform) : null;
+
+  const chosenSet = ensureSet(state.chosenElectives, sec.id);
+  const itemsHtml = classes.map(cls => {
+    const id = cls.id;
+    const selected = chosenSet.has(id);
+    const num = cls.class_number || '';
+    const name = cls.class_name || '';
+    const credits = Number(cls.credits) || 0;
+    return `
+      <li class="class-item">
+        <div class="class-card selectable ${selected ? 'selected' : ''}" data-class-id="${id}">
+          <div class="cc-row1">
+            <button class="card-check" aria-pressed="${selected}" aria-label="Select elective"></button>
+            <span class="class-number">${num}</span>
+            <button class="info-btn" aria-label="Details">i</button>
+          </div>
+          <div class="cc-row2 class-name">${name}</div>
+          <div class="cc-row3 class-credits">${credits}cr</div>
+        </div>
+      </li>
+    `;
+  }).join('');
+
+  const headerTitle = `Choose Electives for ${sec.parentCourseName}`;
+  const headerSubtitle = needCredits ? `Choose ${needCredits} Credits` : 'Choose electives';
+  const isLast = idx === (state.electiveSections.length - 1);
+
+  inline.innerHTML = `
+    <div class="electives-panel inline">
+      <div class="elective-toolbar">
+        <div class="et-titles">
+          <div class="et-title">${headerTitle}</div>
+          <div class="et-sub">${sec.section_name} • ${headerSubtitle}</div>
+        </div>
+        <div class="et-progress">${idx + 1} / ${state.electiveSections.length}</div>
+      </div>
+      <div class="elective-classes">
+        <ul class="classes-list">${itemsHtml}</ul>
+      </div>
+      <div class="wizard-actions below">
+        <button class="btn back" id="wiz-back-inline" ${idx === 0 ? 'disabled' : ''}>Back</button>
+        <button class="btn next" id="wiz-next-inline" disabled>${isLast ? 'Finish' : 'Next'}</button>
+      </div>
+    </div>
+  `;
+
+  const updateNextEnabled = () => {
+    const selectedIds = Array.from(ensureSet(state.chosenElectives, sec.id));
+    const nextEl = document.getElementById('wiz-next-inline');
+    if (!needCredits) {
+      if (nextEl) nextEl.disabled = selectedIds.length === 0;
+      return;
+    }
+    const { credits } = computeSectionSelectionCredits(sec, selectedIds);
+    if (chooseCount) {
+      const ok = selectedIds.length >= chooseCount;
+      if (nextEl) nextEl.disabled = !ok;
+    } else {
+      const allowed = needCredits + 1;
+      const ok = credits >= needCredits && credits <= allowed;
+      if (nextEl) nextEl.disabled = !ok;
+    }
+  };
+
+  inline.querySelectorAll('.class-card.selectable').forEach(card => {
+    const cid = Number(card.getAttribute('data-class-id'));
+    const toggle = () => {
+      const set = ensureSet(state.chosenElectives, sec.id);
+      const nextSelected = new Set(set);
+      if (nextSelected.has(cid)) nextSelected.delete(cid); else nextSelected.add(cid);
+      if (needCredits) {
+        const { credits } = computeSectionSelectionCredits(sec, Array.from(nextSelected));
+        const allowed = needCredits + 1;
+        if (credits > allowed) return;
+      }
+      if (set.has(cid)) set.delete(cid); else set.add(cid);
+      card.classList.toggle('selected');
+      const btn = card.querySelector('.card-check');
+      if (btn) btn.setAttribute('aria-pressed', String(set.has(cid)));
+      updateNextEnabled();
+    };
+    card.addEventListener('click', (e) => { if (e.target && (e.target.classList.contains('info-btn'))) return; toggle(); });
+    const chk = card.querySelector('.card-check');
+    if (chk) chk.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+  });
+
+  updateNextEnabled();
+
+  const backBtn = document.getElementById('wiz-back-inline');
+  const nextBtn = document.getElementById('wiz-next-inline');
+  if (backBtn) backBtn.addEventListener('click', () => {
+    if (state.electiveIndex > 0) {
+      state.electiveIndex -= 1;
+      renderElectivesWizardInline();
+    }
+  });
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    if (state.electiveIndex < state.electiveSections.length - 1) {
+      state.electiveIndex += 1;
+      renderElectivesWizardInline();
+    } else {
+      state.electivesComplete = true;
+      const panel = inline.querySelector('.electives-panel.inline .elective-classes');
+      if (panel) panel.innerHTML = '<div class="electives-finish">Electives selected. Adjust constraints and generate your schedule.</div>';
+      const toolbar = inline.querySelector('.elective-toolbar');
+      if (toolbar) toolbar.style.display = 'none';
+      if (nextBtn) nextBtn.disabled = true;
+  // Reveal the outside Next button now that electives are complete
+  const outsideNextWrap = document.querySelector('.actions.actions-outside');
+  if (outsideNextWrap) outsideNextWrap.style.display = '';
+    }
+  });
 }
 
 // Build a global index of classes by id from all sections and additional classes

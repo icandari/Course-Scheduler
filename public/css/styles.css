@@ -138,14 +138,28 @@ h1,h2,h3,h4,h5,h6,
 }
 @media (max-width: 900px){
   .constraints-layout{ display:flex; flex-direction:column; gap:14px; }
-  /* Move the canvas above the sidebar on mobile */
-  .constraints-canvas{ order:-1; }
+  /* Place the schedule canvas below the sidebar on mobile */
+  .constraints-canvas{ order: 1; position: relative; z-index: 0; }
+  /* Make sidebar non-sticky on mobile so it doesn't cover the schedule */
+  .constraints-sidebar{
+    position: static !important;
+    top: auto !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    z-index: auto !important;
+  }
 }
 .constraints-sidebar{
   display:flex; flex-direction:column; gap:14px;
-  position:sticky; top:96px;
+  /* Default: non-sticky so it never overlays content when scrolling */
+  position: static; top: auto;
   /* Remove scroll from sidebar per request; let page scroll instead */
   max-height:none; overflow:visible;
+}
+/* Restore sticky behavior only on wide desktops */
+@media (min-width: 1200px){
+  .constraints-sidebar{ position: sticky; top:96px; }
 }
 .sidebar-box{ padding:16px; }
 .sidebar-box.small{ --ui-scale: 0.9; --control-scale: 0.8; }
@@ -178,7 +192,16 @@ h1,h2,h3,h4,h5,h6,
   width:100%; resize:vertical; border:1px solid var(--border); border-radius:10px;
   padding:10px; font-family: var(--font-sans);
 }
-.constraints-canvas{ min-height: 400px; background: transparent; border:none; border-radius:0; }
+.constraints-canvas{ min-height: 400px; background: transparent; border:none; border-radius:0; position:relative; z-index:0; }
+
+/* Display-only label in sidebar for selected Holokai courses */
+.sd-display{
+  display:flex; align-items:center; gap:8px; width:100%;
+  height: calc(var(--control-h) * .8);
+  border:1px solid var(--border); border-radius:10px;
+  padding:6px 10px; background:#f9fafb; color:#111827;
+}
+.sd-display .sd-name{ font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 /* Stats box */
 .stats-box{
@@ -442,6 +465,8 @@ h1,h2,h3,h4,h5,h6,
 .btn{ appearance:none; border:none; cursor:pointer; border-radius:999px; padding:calc(10px * var(--ui-scale)) calc(16px * var(--ui-scale)); font-weight:600; font-size:calc(1rem * var(--ui-scale)); }
 .btn.next{ background:var(--blue-600); color:#fff; box-shadow:0 2px 0 rgba(0,0,0,.05); }
 .btn.next:disabled{ background:#cbd5e1; cursor:not-allowed; }
+/* Smaller Back button style in sidebar */
+#back-to-holokai-btn{ font-size: 0.8rem; padding: 6px 12px; }
 
 /* Helper legend */
 .legend{ display:flex; gap:16px; align-items:center; justify-content:center; flex-wrap:wrap; color:var(--muted); font-size:15px; margin-top:45px; }
@@ -472,6 +497,19 @@ h1,h2,h3,h4,h5,h6,
 /* At tablet and below, slightly reduce side padding */
 @media (max-width: 900px){
   .app{ padding:72px 12px 60px 12px; }
+  /* Keep a slight white overlay at the very bottom on mobile so the background image edge never shows */
+  body{
+    background-image:
+      linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.95) 0%,
+        rgba(255,255,255,0.88) 30%,
+        rgba(255,255,255,0.40) 55%,
+        rgba(255,255,255,0.40) 75%,
+        rgba(255,255,255,0.15) 100%
+      ),
+      url('/assets/Background.svg');
+  }
 }
 
 /* Mobile behavior */
@@ -523,3 +561,21 @@ h1,h2,h3,h4,h5,h6,
 
 /* Gray-out style for an individual sidebar box when disabled */
 .constraints-sidebar .sidebar-box.disabled{ opacity: .5; filter: grayscale(0.15); }
+
+/* ===== Inline Electives (first page) alignment ===== */
+/* Match Holokai card width and center inline electives block */
+#electives-inline{
+  width: calc(var(--holokai-card-width) / var(--holokai-card-scale));
+  margin-inline: auto;
+  margin-top: 14px;
+}
+/* Ensure inline variant keeps card chrome even on mobile */
+@media (max-width: 900px){
+  .electives-panel.inline{
+    background:#fff;
+    border:1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding:16px;
+    border-radius:12px;
+  }
+}
